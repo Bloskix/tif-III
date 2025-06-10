@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    INITIAL_ADMIN_EMAIL: str = os.getenv("INITIAL_ADMIN_EMAIL")
+    INITIAL_ADMIN_USERNAME: str = os.getenv("INITIAL_ADMIN_USERNAME")
+    INITIAL_ADMIN_PASSWORD: str = os.getenv("INITIAL_ADMIN_PASSWORD")
+
     OPENSEARCH_HOST: str = os.getenv("OPENSEARCH_HOST")
     OPENSEARCH_PORT: int = int(os.getenv("OPENSEARCH_PORT"))
     OPENSEARCH_USER: str = os.getenv("OPENSEARCH_USER")

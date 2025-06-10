@@ -4,7 +4,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, BASE_DIR
-from app.api import auth
+from app.api import auth, users
+from app.scripts.create_initial_admin import create_initial_admin
 
 # Cargar variables de entorno al inicio
 load_dotenv(BASE_DIR / ".env")
@@ -31,6 +32,16 @@ app.include_router(
     prefix=f"{settings.API_V1_STR}/auth",
     tags=["authentication"]
 )
+
+# Incluir las rutas de usuarios
+app.include_router(
+    users.router,
+    prefix=f"{settings.API_V1_STR}",
+    tags=["users"]
+)
+
+# Crear admin inicial si no existe
+create_initial_admin()
 
 @app.get("/")
 async def root():
