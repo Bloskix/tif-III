@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, BASE_DIR
+from app.api import auth
 
 # Cargar variables de entorno al inicio
 load_dotenv(BASE_DIR / ".env")
@@ -18,10 +19,17 @@ app = FastAPI(
 # Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, esto debe ser más restrictivo
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+# Incluir las rutas de autenticación
+app.include_router(
+    auth.router,
+    prefix=f"{settings.API_V1_STR}/auth",
+    tags=["authentication"]
 )
 
 @app.get("/")

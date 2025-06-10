@@ -1,35 +1,39 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+import json
 
-# Obtener la ruta base del proyecto (directorio backend)
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Cargar variables de entorno desde la ubicación correcta
 load_dotenv(BASE_DIR / ".env")
 
 class Settings(BaseSettings):
-    # Configuración general
     ENV: str = "development"
     PROJECT_NAME: str = "Sistema de Monitoreo de Seguridad"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
-    # Configuración de base de datos
+    BACKEND_CORS_ORIGINS: List[str] = []
+
+    @property
+    def BACKEND_CORS_ORIGINS_LIST(self) -> List[str]:
+        try:
+            return json.loads(os.getenv("BACKEND_CORS_ORIGINS", "[]"))
+        except json.JSONDecodeError:
+            return []
+    
     POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB")
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
-    # Configuración JWT
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    # Configuración OpenSearch
     OPENSEARCH_HOST: str = os.getenv("OPENSEARCH_HOST")
     OPENSEARCH_PORT: int = int(os.getenv("OPENSEARCH_PORT"))
     OPENSEARCH_USER: str = os.getenv("OPENSEARCH_USER")
@@ -37,7 +41,6 @@ class Settings(BaseSettings):
     OPENSEARCH_USE_SSL: bool = os.getenv("OPENSEARCH_USE_SSL", "true").lower() == "true"
     OPENSEARCH_VERIFY_CERTS: bool = os.getenv("OPENSEARCH_VERIFY_CERTS", "false").lower() == "true"
 
-    # Configuración Email
     SMTP_HOST: str = os.getenv("SMTP_HOST")
     SMTP_PORT: int = int(os.getenv("SMTP_PORT"))
     SMTP_USER: str = os.getenv("SMTP_USER")
@@ -53,10 +56,12 @@ class Settings(BaseSettings):
         super().__init__(**kwargs)
         self._init_database_url()
         self._validate_config()
+        self.BACKEND_CORS_ORIGINS = self.BACKEND_CORS_ORIGINS_LIST
 
     def _init_database_url(self) -> None:
         """Inicializa la URL de la base de datos si no está configurada"""
         if not self.SQLALCHEMY_DATABASE_URI:
+            
             self.SQLALCHEMY_DATABASE_URI = (
                 f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
                 f"@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"
