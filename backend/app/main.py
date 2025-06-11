@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, BASE_DIR
 from app.api import auth, users
 from app.scripts.create_initial_admin import create_initial_admin
+from app.scripts.check_opensearch_connection import check_opensearch_connection
 
 # Cargar variables de entorno al inicio
 load_dotenv(BASE_DIR / ".env")
@@ -42,6 +43,10 @@ app.include_router(
 
 # Crear admin inicial si no existe
 create_initial_admin()
+
+# Verificar la conexión a OpenSearch
+check_opensearch_connection()
+
 
 @app.get("/")
 async def root():

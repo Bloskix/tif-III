@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 import json
+from pydantic import EmailStr
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -40,6 +41,7 @@ class Settings(BaseSettings):
 
     OPENSEARCH_HOST: str = os.getenv("OPENSEARCH_HOST")
     OPENSEARCH_PORT: int = int(os.getenv("OPENSEARCH_PORT"))
+    OPENSEARCH_INDEX: str = os.getenv("OPENSEARCH_INDEX")
     OPENSEARCH_USER: str = os.getenv("OPENSEARCH_USER")
     OPENSEARCH_PASSWORD: str = os.getenv("OPENSEARCH_PASSWORD")
     OPENSEARCH_USE_SSL: bool = os.getenv("OPENSEARCH_USE_SSL", "true").lower() == "true"
