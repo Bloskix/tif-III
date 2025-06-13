@@ -28,6 +28,11 @@ ENV/
 
 # Environment variables
 .env
+# OpenSearch certificates
+app/opensearch/certs/
+*.crt
+*.pem
+*.key
 
 # IDE
 .idea/

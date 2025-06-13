@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, BASE_DIR
 from app.api import auth, users, alerts
 from app.scripts.create_initial_admin import create_initial_admin
-from app.scripts.check_opensearch_connection import check_opensearch_connection
+from app.opensearch.client import opensearch_client
 
 # Cargar variables de entorno al inicio
 load_dotenv(BASE_DIR / ".env")
@@ -26,6 +26,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Verificar conexión con OpenSearch
+opensearch_client.check_connection()
 
 # Incluir las rutas de autenticación
 app.include_router(
@@ -51,9 +54,6 @@ app.include_router(
 # Crear admin inicial si no existe
 create_initial_admin()
 
-# Verificar la conexión a OpenSearch
-check_opensearch_connection()
-
 
 @app.get("/")
 async def root():
@@ -65,9 +65,13 @@ async def root():
 
 @app.get("/health")
 async def health_check():
+    is_connected = opensearch_client.check_connection()
     return {
         "status": "ok",
         "environment": os.getenv("ENV", "development"),
         "database": settings.POSTGRES_DB,
-        "opensearch_host": settings.OPENSEARCH_HOST
+        "opensearch": {
+            "host": settings.OPENSEARCH_HOST,
+            "connected": is_connected
+        }
     }

@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     OPENSEARCH_USER: str = os.getenv("OPENSEARCH_USER")
     OPENSEARCH_PASSWORD: str = os.getenv("OPENSEARCH_PASSWORD")
     OPENSEARCH_USE_SSL: bool = os.getenv("OPENSEARCH_USE_SSL", "true").lower() == "true"
-    OPENSEARCH_VERIFY_CERTS: bool = os.getenv("OPENSEARCH_VERIFY_CERTS", "false").lower() == "true"
+    OPENSEARCH_VERIFY_CERTS: bool = os.getenv("OPENSEARCH_VERIFY_CERTS", "true").lower() == "true"
+    OPENSEARCH_CA_CERTS: str = str(BASE_DIR / "app" / "opensearch" / "certs" / "opensearch.crt")
 
     SMTP_HOST: str = os.getenv("SMTP_HOST")
     SMTP_PORT: int = int(os.getenv("SMTP_PORT"))
@@ -79,5 +80,7 @@ class Settings(BaseSettings):
             assert self.SECRET_KEY != "your-secret-key-here", "Debe cambiar la SECRET_KEY en producción"
             assert self.POSTGRES_PASSWORD, "La contraseña de PostgreSQL es requerida en producción"
             assert self.OPENSEARCH_PASSWORD != "admin", "Debe cambiar la contraseña de OpenSearch en producción"
+            if self.OPENSEARCH_VERIFY_CERTS:
+                assert os.path.exists(self.OPENSEARCH_CA_CERTS), "El certificado CA de OpenSearch no existe"
 
 settings = Settings()
