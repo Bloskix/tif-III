@@ -20,6 +20,9 @@ wheels/
 .installed.cfg
 *.egg
 
+# Alembic
+backend/alembic/versions/*
+
 # Virtual Environment
 .venv/
 venv/
