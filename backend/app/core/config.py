@@ -25,39 +25,45 @@ class Settings(BaseSettings):
         except json.JSONDecodeError:
             return []
     
-    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER")
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB")
+    # Variables de Base de Datos
+    POSTGRES_SERVER: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
-    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    # Variables de Seguridad
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    INITIAL_ADMIN_EMAIL: str = os.getenv("INITIAL_ADMIN_EMAIL")
-    INITIAL_ADMIN_USERNAME: str = os.getenv("INITIAL_ADMIN_USERNAME")
-    INITIAL_ADMIN_PASSWORD: str = os.getenv("INITIAL_ADMIN_PASSWORD")
+    # Variables de Admin Inicial
+    INITIAL_ADMIN_EMAIL: str
+    INITIAL_ADMIN_USERNAME: str
+    INITIAL_ADMIN_PASSWORD: str
 
-    OPENSEARCH_HOST: str = os.getenv("OPENSEARCH_HOST")
-    OPENSEARCH_PORT: int = int(os.getenv("OPENSEARCH_PORT"))
-    OPENSEARCH_INDEX: str = os.getenv("OPENSEARCH_INDEX")
-    OPENSEARCH_USER: str = os.getenv("OPENSEARCH_USER")
-    OPENSEARCH_PASSWORD: str = os.getenv("OPENSEARCH_PASSWORD")
-    OPENSEARCH_USE_SSL: bool = os.getenv("OPENSEARCH_USE_SSL", "true").lower() == "true"
-    OPENSEARCH_VERIFY_CERTS: bool = os.getenv("OPENSEARCH_VERIFY_CERTS", "true").lower() == "true"
+    # Variables de OpenSearch
+    OPENSEARCH_HOST: str
+    OPENSEARCH_PORT: int
+    OPENSEARCH_INDEX: str
+    OPENSEARCH_USER: str
+    OPENSEARCH_PASSWORD: str
+    OPENSEARCH_USE_SSL: bool = True
+    OPENSEARCH_VERIFY_CERTS: bool = True
     OPENSEARCH_CA_CERTS: str = str(BASE_DIR / "app" / "opensearch" / "certs" / "opensearch.crt")
 
-    SMTP_HOST: str = os.getenv("SMTP_HOST")
-    SMTP_PORT: int = int(os.getenv("SMTP_PORT"))
-    SMTP_USER: str = os.getenv("SMTP_USER")
-    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD")
-    EMAILS_FROM_EMAIL: str = os.getenv("EMAILS_FROM_EMAIL", "")
-    EMAILS_FROM_NAME: str = os.getenv("EMAILS_FROM_NAME", "")
+    # Variables de Email
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    EMAILS_FROM_EMAIL: str = ""
+    EMAILS_FROM_NAME: str = ""
 
     class Config:
         case_sensitive = True
         env_file = str(BASE_DIR / ".env")
+        validate_default = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -68,7 +74,6 @@ class Settings(BaseSettings):
     def _init_database_url(self) -> None:
         """Inicializa la URL de la base de datos si no está configurada"""
         if not self.SQLALCHEMY_DATABASE_URI:
-            
             self.SQLALCHEMY_DATABASE_URI = (
                 f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
                 f"@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"
@@ -77,9 +82,9 @@ class Settings(BaseSettings):
     def _validate_config(self) -> None:
         """Valida la configuración crítica"""
         if self.ENV == "production":
-            assert self.SECRET_KEY != "your-secret-key-here", "Debe cambiar la SECRET_KEY en producción"
+            assert self.SECRET_KEY, "SECRET_KEY es requerida en producción"
             assert self.POSTGRES_PASSWORD, "La contraseña de PostgreSQL es requerida en producción"
-            assert self.OPENSEARCH_PASSWORD != "admin", "Debe cambiar la contraseña de OpenSearch en producción"
+            assert self.OPENSEARCH_PASSWORD, "La contraseña de OpenSearch es requerida en producción"
             if self.OPENSEARCH_VERIFY_CERTS:
                 assert os.path.exists(self.OPENSEARCH_CA_CERTS), "El certificado CA de OpenSearch no existe"
 

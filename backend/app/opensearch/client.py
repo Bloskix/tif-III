@@ -5,8 +5,9 @@ import ssl
 import logging
 import requests
 import json
-from urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class OpenSearchClient:
     _instance: Optional['OpenSearchClient'] = None
@@ -29,6 +30,7 @@ class OpenSearchClient:
             ssl_context.verify_mode = ssl.CERT_REQUIRED
             
             if not settings.OPENSEARCH_VERIFY_CERTS:
+                print("WARNING:  Verificación de certificados SSL desactivada")
                 ssl_context.verify_mode = ssl.CERT_NONE
 
             self._client = OpenSearch(
@@ -47,7 +49,7 @@ class OpenSearchClient:
                 ssl_context=ssl_context
             )
             self._initialized = True
-            print("INFO:     Cliente OpenSearch inicializado")
+            print("INFO:     Cliente OpenSearch inicializado exitosamente en", settings.OPENSEARCH_HOST, ":", settings.OPENSEARCH_PORT)
         except Exception as e:
             print(f"ERROR:    Error al inicializar el cliente OpenSearch: {str(e)}")
             raise
@@ -57,6 +59,8 @@ class OpenSearchClient:
         """Retorna la instancia del cliente de OpenSearch"""
         if not self._initialized:
             self._initialize_client()
+        if self._client is None:
+            raise Exception("El cliente OpenSearch no está inicializado correctamente")
         return self._client
 
     def check_connection(self) -> bool:
@@ -73,6 +77,7 @@ class OpenSearchClient:
                 if settings.OPENSEARCH_VERIFY_CERTS:
                     session.verify = settings.OPENSEARCH_CA_CERTS
                 else:
+                    print("WARNING:  Verificación SSL desactivada para la sesión de requests")
                     session.verify = False
             
             response = session.get(
@@ -84,20 +89,21 @@ class OpenSearchClient:
             try:
                 result = self.client.ping()
                 if result:
-                    print("INFO:     Conexión exitosa a OpenSearch")
                     try:
                         info = self.client.info()
                         print(f"INFO:     Cluster: {info.get('cluster_name')} ({info.get('version', {}).get('distribution')} {info.get('version', {}).get('number')})")
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        print(f"WARNING:  No se pudo obtener información del cluster: {str(e)}")
                 return result
             except Exception as e:
                 if isinstance(e, OpenSearchException) and "SSLError" in str(e) and response.status_code == 200:
+                    print("WARNING:  Conexión establecida pero con advertencias SSL")
                     return True
+                print(f"ERROR:    Error en ping a OpenSearch: {str(e)}")
                 return False
             
-        except Exception:
-            print("ERROR:    No se pudo establecer conexión con OpenSearch")
+        except Exception as e:
+            print(f"ERROR:    Error al verificar conexión con OpenSearch: {str(e)}")
             return False
 
     def get_cluster_info(self) -> dict:
@@ -108,6 +114,7 @@ class OpenSearchClient:
         try:
             return self.client.info()
         except Exception as e:
+            print(f"ERROR:    Error al obtener información del cluster: {str(e)}")
             raise Exception(f"Error al obtener información del cluster: {str(e)}")
 
 # Instancia global del cliente
