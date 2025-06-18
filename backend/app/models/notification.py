@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from app.models.base_model import Base
 
 class NotificationSettings(Base):
-    __tablename__ = "notification_settings"
+    __tablename__ = "notification_settings"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
