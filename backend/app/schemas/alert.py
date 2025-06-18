@@ -17,6 +17,7 @@ class WazuhRule(BaseModel):
 
 class Alert(BaseModel):
     """Esquema principal para las alertas de Wazuh"""
+    id: str = Field(..., description="ID único de la alerta en OpenSearch")
     timestamp: datetime = Field(..., description="Timestamp de la alerta")
     agent: WazuhAgent = Field(..., description="Información del agente")
     rule: WazuhRule = Field(..., description="Información de la regla")

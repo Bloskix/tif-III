@@ -140,6 +140,7 @@ class AlertService:
                 
                 # Crear objeto Alert
                 alert = Alert(
+                    id=hit["_id"],  # Agregamos el ID de OpenSearch
                     timestamp=source["timestamp"],
                     agent=source["agent"],
                     rule=source["rule"],
