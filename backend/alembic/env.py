@@ -15,7 +15,9 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from app.db.base import Base
 from app.core.config import settings
 from app.models.user import User
-from app.models.notification import NotificationSettings
+from app.models.notification_email import NotificationEmail
+from app.models.notification_config import NotificationConfig
+from app.models.notification_history import NotificationHistory
 from app.models.managed_alert import ManagedAlert
 from app.models.alert_note import AlertNote
 
