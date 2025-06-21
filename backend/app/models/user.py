@@ -18,7 +18,5 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
 
-    notification_settings = relationship("NotificationSettings", back_populates="user", uselist=False)
-
     def __repr__(self):
         return f"<User {self.username}>" 

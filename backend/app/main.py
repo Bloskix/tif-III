@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, BASE_DIR
-from app.api import auth, users, alerts, review
+from app.api import auth, users, alerts, review, notifications
 from app.scripts.create_initial_admin import create_initial_admin
 from app.opensearch.client import opensearch_client
 
@@ -56,6 +56,13 @@ app.include_router(
     review.router,
     prefix=f"{settings.API_V1_STR}/review",
     tags=["review"]
+)
+
+# Incluir las rutas de notificaciones
+app.include_router(
+    notifications.router,
+    prefix=f"{settings.API_V1_STR}/notifications",
+    tags=["notifications"]
 )
 
 # Crear admin inicial si no existe
