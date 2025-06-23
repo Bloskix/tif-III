@@ -9,7 +9,7 @@ from ..core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 from ..schemas.auth import Token, UserCreate, User
-from ..models.user import User as UserModel
+from ..models.user import User as UserModel, UserRole
 from ..db.base import get_db
 
 router = APIRouter()
@@ -19,14 +19,12 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    
     user = db.query(UserModel).filter(
         (UserModel.email == form_data.username) | 
         (UserModel.username == form_data.username)
     ).first()
     
-    
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    if not user or not verify_password(form_data.password, str(user.hashed_password)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Correo, nombre de usuario o contraseña incorrectos",
@@ -35,7 +33,7 @@ async def login_for_access_token(
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": str(user.email)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -54,11 +52,15 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
         )
     
     from ..core.security import get_password_hash
-    db_user = UserModel(
-        email=user.email,
-        username=user.username,
-        hashed_password=get_password_hash(user.password)
-    )
+    
+    # Crear una nueva instancia del modelo
+    db_user = UserModel()
+    # Establecer los valores manualmente
+    setattr(db_user, 'email', str(user.email))
+    setattr(db_user, 'username', str(user.username))
+    setattr(db_user, 'hashed_password', get_password_hash(str(user.password)))
+    setattr(db_user, 'role', UserRole.OPERATOR)
+    
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

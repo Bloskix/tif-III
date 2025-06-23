@@ -30,7 +30,9 @@ class EmailService:
                 "smtp_password": settings.SMTP_PASSWORD,
                 "sender_email": settings.EMAILS_FROM_EMAIL or settings.SMTP_USER
             }
-            config = NotificationConfig(**default_config)
+            config = NotificationConfig()
+            for key, value in default_config.items():
+                setattr(config, key, value)
             db.add(config)
             db.commit()
             db.refresh(config)
@@ -82,16 +84,15 @@ class EmailService:
         msg.attach(MIMEText(body, "plain"))
 
         # Registrar el intento de notificación
-        history_data = {
-            "alert_id": getattr(alert, 'id'),
-            "user_id": getattr(user, 'id'),
-            "recipients": recipients,
-            "subject": msg["Subject"],
-            "message": custom_message,
-            "is_success": False,
-            "error_message": None
-        }
-        history = NotificationHistory(**history_data)
+        history = NotificationHistory()
+        setattr(history, 'alert_id', getattr(alert, 'id'))
+        setattr(history, 'user_id', getattr(user, 'id'))
+        setattr(history, 'recipients', recipients)
+        setattr(history, 'subject', msg["Subject"])
+        setattr(history, 'message', custom_message)
+        setattr(history, 'is_success', False)
+        setattr(history, 'error_message', None)
+        
         db.add(history)
         db.commit()
 
@@ -112,13 +113,13 @@ class EmailService:
             server.quit()
             
             # Registrar éxito
-            history.is_success = True
+            setattr(history, 'is_success', True)
             db.commit()
             return True
 
         except Exception as e:
             # Registrar error
-            history.error_message = str(e)
+            setattr(history, 'error_message', str(e))
             db.commit()
             return False
 

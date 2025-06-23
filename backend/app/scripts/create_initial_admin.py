@@ -16,15 +16,18 @@ def create_initial_admin():
         if admin:
             print(f"INFO:     Ya existe un usuario admin: {admin.email}")
             return
-        hashed_password = get_password_hash(ADMIN_PASSWORD)
-        new_admin = User(
-            email=ADMIN_EMAIL,
-            username=ADMIN_USERNAME,
-            hashed_password=hashed_password,
-            role=UserRole.ADMIN,
-            is_superuser=True,
-            is_active=True
-        )
+        
+        # Crear una nueva instancia del modelo User
+        new_admin = User()
+        
+        # Establecer los valores usando setattr
+        setattr(new_admin, 'email', ADMIN_EMAIL)
+        setattr(new_admin, 'username', ADMIN_USERNAME)
+        setattr(new_admin, 'hashed_password', get_password_hash(ADMIN_PASSWORD))
+        setattr(new_admin, 'role', UserRole.ADMIN)
+        setattr(new_admin, 'is_superuser', True)
+        setattr(new_admin, 'is_active', True)
+        
         db.add(new_admin)
         db.commit()
         print(f"INFO:     Usuario admin creado: {ADMIN_EMAIL} / {ADMIN_USERNAME}")

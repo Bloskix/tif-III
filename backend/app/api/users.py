@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 from app.db.base import get_db
 from app.models.user import User, UserRole
 from app.schemas.user import UserResponse, UserUpdate, UserRoleUpdate, UserList
@@ -54,7 +53,9 @@ async def read_users(
     """
     users = db.query(User).offset(skip).limit(limit).all()
     total = db.query(User).count()
-    return UserList(total=total, users=users)
+    # Convertir la lista de usuarios a UserResponse
+    user_responses = [UserResponse.from_orm(user) for user in users]
+    return UserList(total=total, users=user_responses)
 
 @router.get("/{user_id}", response_model=UserResponse)
 @check_roles([UserRole.ADMIN])
@@ -110,7 +111,9 @@ async def update_user_role(
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
     # Verificar que no sea el último admin
-    if db_user.role == UserRole.ADMIN and role_update.role != UserRole.ADMIN:
+    current_role = str(db_user.role)
+    new_role = role_update.role
+    if current_role == UserRole.ADMIN.value and new_role != UserRole.ADMIN:
         admin_count = db.query(User).filter(User.role == UserRole.ADMIN).count()
         if admin_count <= 1:
             raise HTTPException(
@@ -118,7 +121,7 @@ async def update_user_role(
                 detail="No se puede cambiar el rol del último administrador"
             )
     
-    db_user.role = role_update.role
+    setattr(db_user, 'role', role_update.role)
     db.commit()
     db.refresh(db_user)
     return db_user
@@ -138,7 +141,8 @@ async def delete_user(
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
     # Verificar que no sea el último admin
-    if db_user.role == UserRole.ADMIN:
+    current_role = str(db_user.role)
+    if current_role == UserRole.ADMIN.value:
         admin_count = db.query(User).filter(User.role == UserRole.ADMIN).count()
         if admin_count <= 1:
             raise HTTPException(
