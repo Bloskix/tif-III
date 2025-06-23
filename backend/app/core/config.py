@@ -52,14 +52,6 @@ class Settings(BaseSettings):
     OPENSEARCH_VERIFY_CERTS: bool = True
     OPENSEARCH_CA_CERTS: str = str(BASE_DIR / "app" / "opensearch" / "certs" / "opensearch.crt")
 
-    # Variables de Email
-    SMTP_HOST: str
-    SMTP_PORT: int
-    SMTP_USER: str
-    SMTP_PASSWORD: str
-    EMAILS_FROM_EMAIL: str = ""
-    EMAILS_FROM_NAME: str = ""
-
     class Config:
         case_sensitive = True
         env_file = str(BASE_DIR / ".env")

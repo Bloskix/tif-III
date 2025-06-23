@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 # Esquemas para NotificationEmail
 class NotificationEmailBase(BaseModel):
@@ -25,26 +25,33 @@ class NotificationEmailResponse(NotificationEmailBase):
 class NotificationConfigBase(BaseModel):
     alert_threshold: int
     is_enabled: bool
-    smtp_host: str
-    smtp_port: int
-    smtp_username: str
-    smtp_password: str
     sender_email: EmailStr
+    smtp_password: str
+    sender_name: str
 
 class NotificationConfigUpdate(BaseModel):
     alert_threshold: Optional[int] = None
     is_enabled: Optional[bool] = None
-    smtp_host: Optional[str] = None
-    smtp_port: Optional[int] = None
-    smtp_username: Optional[str] = None
-    smtp_password: Optional[str] = None
     sender_email: Optional[EmailStr] = None
+    smtp_password: Optional[str] = None
+    sender_name: Optional[str] = None
 
 class NotificationConfigResponse(NotificationConfigBase):
     id: int
+    smtp_host: str
+    smtp_port: int
+    smtp_username: str
 
     class Config:
         from_attributes = True
+
+class NotificationConfigCreate(BaseModel):
+    """Schema para crear una nueva configuración de notificaciones"""
+    alert_threshold: int = Field(default=15, ge=0, le=15)  # Nivel mínimo de alerta para notificar
+    is_enabled: bool = True
+    sender_email: EmailStr
+    smtp_password: str
+    sender_name: str = "Sistema de Alertas de Seguridad TIF"
 
 # Esquema para envío de notificaciones
 class NotificationSendRequest(BaseModel):

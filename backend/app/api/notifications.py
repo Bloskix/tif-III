@@ -7,6 +7,7 @@ from app.dependencies.auth import get_current_user
 from app.models.user import User, UserRole
 from app.models.notification_email import NotificationEmail
 from app.models.managed_alert import ManagedAlert
+from app.models.notification_config import NotificationConfig
 from app.services.email_service import EmailService
 from app.middleware.role_checker import check_roles
 from app.schemas.notification import (
@@ -15,6 +16,7 @@ from app.schemas.notification import (
     NotificationEmailResponse,
     NotificationConfigUpdate,
     NotificationConfigResponse,
+    NotificationConfigCreate,
     NotificationSendRequest
 )
 
@@ -30,7 +32,44 @@ def get_notification_config(
 ):
     """Obtiene la configuración actual de notificaciones"""
     config = EmailService.get_config(db)
+    if not config:
+        raise HTTPException(
+            status_code=404,
+            detail="No existe configuración de notificaciones. Por favor, créela primero."
+        )
     return config
+
+@router.post("/notification/config", response_model=NotificationConfigResponse)
+@check_roles([UserRole.ADMIN])
+def create_notification_config(
+    config: NotificationConfigCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Crea la configuración inicial de notificaciones"""
+    # Verificar si ya existe una configuración
+    existing_config = EmailService.get_config(db)
+    if existing_config:
+        raise HTTPException(
+            status_code=400,
+            detail="Ya existe una configuración de notificaciones. Use PUT para actualizarla."
+        )
+    
+    # Crear nueva configuración
+    config_dict = config.dict()
+    config_dict['smtp_username'] = config_dict['sender_email']  # Autocompletar smtp_username
+    new_config = NotificationConfig(**config_dict)
+    db.add(new_config)
+    try:
+        db.commit()
+        db.refresh(new_config)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error al crear la configuración: {str(e)}"
+        )
+    return new_config
 
 @router.put("/notification/config", response_model=NotificationConfigResponse)
 @check_roles([UserRole.ADMIN])
@@ -41,8 +80,15 @@ def update_notification_config(
 ):
     """Actualiza la configuración de notificaciones"""
     current_config = EmailService.get_config(db)
-    for key, value in config.dict(exclude_unset=True).items():
+    update_data = config.dict(exclude_unset=True)
+    
+    # Si se actualiza sender_email, actualizar también smtp_username
+    if 'sender_email' in update_data:
+        update_data['smtp_username'] = update_data['sender_email']
+    
+    for key, value in update_data.items():
         setattr(current_config, key, value)
+    
     db.commit()
     db.refresh(current_config)
     return current_config
@@ -135,7 +181,7 @@ def send_notification(
         raise HTTPException(status_code=400, detail="No se encontraron correos válidos")
     
     # Enviar la notificación
-    success = EmailService.send_alert_notification(
+    success, error_message = EmailService.send_alert_notification(
         db=db,
         alert=alert,
         user=current_user,
@@ -144,6 +190,9 @@ def send_notification(
     )
     
     if not success:
-        raise HTTPException(status_code=500, detail="Error al enviar la notificación")
+        raise HTTPException(
+            status_code=500,
+            detail=error_message or "Error al enviar la notificación"
+        )
     
     return {"message": "Notificación enviada correctamente"} 
