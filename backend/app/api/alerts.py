@@ -17,6 +17,7 @@ async def get_alerts(
     from_date: Optional[datetime] = Query(None, description="Fecha inicial (ISO format)"),
     to_date: Optional[datetime] = Query(None, description="Fecha final (ISO format)"),
     search_term: Optional[str] = Query(None, description="Término de búsqueda general"),
+    alert_id: Optional[str] = Query(None, description="ID específico de una alerta"),
     current_user = Depends(get_current_user)
 ):
     """
@@ -29,7 +30,8 @@ async def get_alerts(
             rule_groups=rule_groups,
             from_date=from_date,
             to_date=to_date,
-            search_term=search_term
+            search_term=search_term,
+            alert_id=alert_id
         )
         return await alert_service.get_alerts(page=page, size=size, filters=filters)
     except Exception as e:

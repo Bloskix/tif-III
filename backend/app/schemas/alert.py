@@ -40,4 +40,5 @@ class AlertFilters(BaseModel):
     rule_groups: Optional[List[str]] = Field(None, description="Lista de grupos de reglas")
     from_date: Optional[datetime] = Field(None, description="Fecha inicial")
     to_date: Optional[datetime] = Field(None, description="Fecha final")
-    search_term: Optional[str] = Field(None, description="Término de búsqueda general") 
+    search_term: Optional[str] = Field(None, description="Término de búsqueda general")
+    alert_id: Optional[str] = Field(None, description="ID específico de una alerta") 

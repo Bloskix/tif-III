@@ -81,6 +81,9 @@ class AlertService:
                     }
                 })
 
+            if filters.alert_id:
+                must_conditions.append({"term": {"_id": filters.alert_id}})
+
         return {
             "query": {
                 "bool": {
