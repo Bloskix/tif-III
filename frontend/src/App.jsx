@@ -1,36 +1,98 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import Button from './components/Button/Button';
+import dashboardStyles from './pages/dashboard/Dashboard.module.css';
+import publicStyles from './layouts/PublicLayout.module.css';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const Dashboard = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className={dashboardStyles.container}>
+      <div className={dashboardStyles.content}>
+        <div className={dashboardStyles.header}>
+          <h1 className={dashboardStyles.title}>
+            Dashboard (Próximamente)
+          </h1>
+          <Button
+            variant="secondary"
+            onClick={handleLogout}
+          >
+            Cerrar Sesión
+          </Button>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <h1 className="text-3xl font-bold text-blue-600">¡Tailwind funciona!</h1>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default App
+// Layout para rutas públicas
+const PublicLayout = () => {
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return (
+    <div className={publicStyles.container}>
+      <Outlet />
+    </div>
+  );
+};
+
+// Layout para rutas privadas
+const PrivateLayout = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return <Outlet />;
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <Routes>
+          {/* Rutas Públicas */}
+          <Route element={<PublicLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+
+          {/* Rutas Privadas */}
+          <Route element={<PrivateLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Aquí irán futuras rutas privadas */}
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Route>
+
+          {/* Ruta por defecto */}
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
+};
+
+export default App;
