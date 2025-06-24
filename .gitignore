@@ -51,4 +51,22 @@ app/opensearch/certs/
 .coverage
 htmlcov/
 .pytest_cache/
- 
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+frontend/logs/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.vite/
+frontend/.DS_Store
+
+# Dependency directories
+**/node_modules/
+**/dist/
+**/.vite/
