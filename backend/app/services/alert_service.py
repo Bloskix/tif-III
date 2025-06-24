@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from app.opensearch.client import opensearch_client
 from app.schemas.alert import Alert, AlertResponse, AlertFilters
+from opensearchpy.exceptions import NotFoundError
 
 class AlertService:
     def __init__(self):
@@ -161,16 +162,90 @@ class AlertService:
         except Exception as e:
             raise Exception(f"Error al obtener alertas: {str(e)}")
 
-    async def get_alert_stats(self) -> Dict[str, Any]:
+    async def get_daily_alert_stats(self) -> Dict[str, Any]:
         """
-        Obtiene estadísticas básicas de las alertas
+        Obtiene estadísticas básicas de las alertas del día actual.
         """
         try:
-            # Usar el índice del día actual para las estadísticas
+            # Usar el índice del día actual
             current_index = self._get_index_pattern()
             
             query = {
                 "size": 0,
+                "aggs": {
+                    "rule_levels": {
+                        "terms": {
+                            "field": "rule.level",
+                            "size": 15
+                        }
+                    },
+                    "top_rules": {
+                        "terms": {
+                            "field": "rule.description.keyword",
+                            "size": 10
+                        }
+                    },
+                    "alerts_over_time": {
+                        "date_histogram": {
+                            "field": "@timestamp",
+                            "calendar_interval": "hour"  # Cambiado a horas para vista diaria
+                        }
+                    }
+                }
+            }
+
+            response = self.client.search(
+                index=current_index,
+                body=query
+            )
+
+            return {
+                "rule_levels": response["aggregations"]["rule_levels"]["buckets"],
+                "top_rules": response["aggregations"]["top_rules"]["buckets"],
+                "alerts_over_time": response["aggregations"]["alerts_over_time"]["buckets"]
+            }
+
+        except NotFoundError as e:
+            if "index_not_found_exception" in str(e):
+                return {
+                    "message": "No existen alertas para el día actual.",
+                    "error": "index_not_found_exception"
+                }
+            raise Exception(f"Error al obtener estadísticas: {str(e)}")
+        except Exception as e:
+            raise Exception(f"Error al obtener estadísticas: {str(e)}")
+
+    async def get_monthly_alert_stats(self) -> Dict[str, Any]:
+        """
+        Obtiene estadísticas básicas de las alertas del mes actual hasta hoy.
+        """
+        try:
+            # Configurar rango de fechas para el mes actual
+            now = datetime.now()
+            first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Usar un patrón de índice más flexible para el mes actual
+            current_month = now.strftime('%Y.%m')
+            index_pattern = f"wazuh-alerts-{current_month}.*"
+            
+            # Verificar si existen índices para el patrón
+            indices_exist = self.client.indices.exists(index=index_pattern)
+            if not indices_exist:
+                return {
+                    "message": "No existen alertas para el mes actual.",
+                    "error": "index_not_found_exception"
+                }
+            
+            query = {
+                "size": 0,
+                "query": {
+                    "range": {
+                        "@timestamp": {
+                            "gte": first_day.isoformat(),
+                            "lte": now.isoformat()
+                        }
+                    }
+                },
                 "aggs": {
                     "rule_levels": {
                         "terms": {
@@ -194,11 +269,20 @@ class AlertService:
             }
 
             response = self.client.search(
-                index=current_index,
+                index=index_pattern,
                 body=query
             )
 
+            # Verificar si hay resultados
+            total_hits = response["hits"]["total"]["value"]
+            if total_hits == 0:
+                return {
+                    "message": "No existen alertas para el mes actual.",
+                    "error": "no_alerts_found"
+                }
+
             return {
+                "total_alerts": total_hits,
                 "rule_levels": response["aggregations"]["rule_levels"]["buckets"],
                 "top_rules": response["aggregations"]["top_rules"]["buckets"],
                 "alerts_over_time": response["aggregations"]["alerts_over_time"]["buckets"]

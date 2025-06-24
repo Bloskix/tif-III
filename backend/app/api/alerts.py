@@ -35,14 +35,32 @@ async def get_alerts(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/stats")
-async def get_alert_stats(
+@router.get("/stats/daily")
+async def get_daily_stats(
     current_user = Depends(get_current_user)
 ):
     """
-    Obtiene estadísticas básicas de las alertas.
+    Obtiene estadísticas básicas de las alertas del día actual.
     """
     try:
-        return await alert_service.get_alert_stats()
+        stats = await alert_service.get_daily_alert_stats()
+        if "error" in stats:
+            return stats  # Devuelve el mensaje de error si no hay alertas
+        return stats
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/stats/monthly")
+async def get_monthly_stats(
+    current_user = Depends(get_current_user)
+):
+    """
+    Obtiene estadísticas básicas de las alertas del mes actual hasta hoy.
+    """
+    try:
+        stats = await alert_service.get_monthly_alert_stats()
+        if "error" in stats:
+            return stats  # Devuelve el mensaje de error si no hay alertas
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
