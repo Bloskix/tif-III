@@ -1,0 +1,110 @@
+﻿🖥️ VISTA PRINCIPAL DE ALERTAS
+🧭 Vista principal: Dashboard + pestañas “Alertas” / “En revisión”
+* Como muestra la imagen que adjuntaste, tendrás una UI dividida en dos secciones activables.
+
+* Esto te evita tener que mezclar datos que provienen de dos fuentes (OpenSearch y PostgreSQL).
+
+   0. Navbar
+   A la izuierda
+   * Inicio (es para navegar al dashboard)
+   * en revisión
+   * configuracion (solo si es admin)
+   -- 
+   A la derecha
+   * perfil(icono de una personita)
+   * logout (iconon de exit)   
+
+________________
+
+
+🧱 1. Dashboard (arriba)
+   * Muestra métricas generales de actividad.
+
+   * No está ligado directamente a las alertas manipuladas por operadores.
+
+   * Llama a /alerts/statistics → solo consulta OpenSearch.
+
+________________
+
+
+📥 2. Pestaña “Alertas”
+      * Muestra todas las alertas recientes desde OpenSearch.
+
+      * Estado por defecto: "ignorada" (invisible desde PostgreSQL).
+
+      * Permite al operador cambiar el estado a “abierta” (esto activa el registro en la base).
+
+      * No permite agregar notas desde acá (simplifica la UX).
+
+Ventaja:
+ No mezclás alertas del back y de OpenSearch. Solo ves lo que llega en tiempo real.
+________________
+
+
+✏️ 3. Pestaña “En revisión”
+         * Muestra solo alertas abiertas o cerradas, es decir, las que fueron gestionadas y están almacenadas en PostgreSQL.
+
+         * Consulta solo tu base, sin OpenSearch.
+
+         * Permite:
+
+            * Ver notas
+
+            * Agregar notas
+
+            * Cambiar estado (cerrar)
+
+
+Ventaja:
+ Permite al operador enfocarse en lo que realmente está siguiendo y mantiene clara la separación de responsabilidades.
+________________
+
+
+🧾 MODAL / VISTA DETALLE DE ALERTA
+Cuando hacés clic en [👁 Ver]:
+               * Muestra todos los campos de la alerta JSON (formateados)
+
+               * Muestra sección de:
+
+                  * Notas anteriores (con fecha y autor)
+
+                  * Estado actual
+
+                  * Botones para:
+
+                     * Agregar nota
+
+                     * Cambiar estado
+
+________________
+
+
+
+
+✅ Lógica del campo estado para alertas
+🟢 Estados posibles:
+                        1. ignorada: estado por defecto para todas las alertas (no se guarda en la base).
+
+                        2. abierta: cuando un operador o el sistema considera que requiere atención.
+
+                        3. cerrada: cuando la alerta fue gestionada y se considera resuelta.
+
+________________
+
+
+🧠 Lógica de transición y persistencia
+Situación
+	Estado asignado
+	¿Se guarda en PostgreSQL?
+	Alerta nueva llegada desde Wazuh (nivel < 10)
+	ignorada (por defecto)
+	❌ No
+	Alerta nueva de nivel ≥ 10
+	abierta (automático)
+	✅ Sí
+	Un operador abre manualmente una alerta (por decisión propia)
+	abierta
+	✅ Sí
+	Un operador cierra la alerta
+	cerrada
+	✅ Sí

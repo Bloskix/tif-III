@@ -2,45 +2,16 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import Button from './components/Button/Button';
-import dashboardStyles from './pages/dashboard/Dashboard.module.css';
+import HomePage from './pages/home/HomePage';
 import publicStyles from './layouts/PublicLayout.module.css';
 import './App.css';
-
-const Dashboard = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  return (
-    <div className={dashboardStyles.container}>
-      <div className={dashboardStyles.content}>
-        <div className={dashboardStyles.header}>
-          <h1 className={dashboardStyles.title}>
-            Dashboard (Próximamente)
-          </h1>
-          <Button
-            variant="secondary"
-            onClick={handleLogout}
-          >
-            Cerrar Sesión
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Layout para rutas públicas
 const PublicLayout = () => {
   const { isAuthenticated } = useAuth();
   
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/" />;
   }
 
   return (
@@ -82,13 +53,14 @@ const App = () => {
 
           {/* Rutas Privadas */}
           <Route element={<PrivateLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            {/* Aquí irán futuras rutas privadas */}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/alerts" element={<HomePage />} />
+            <Route path="/review" element={<HomePage />} />
+            <Route path="/settings" element={<HomePage />} />
+            <Route path="/me" element={<HomePage />} />
+            {/* Redirigir cualquier otra ruta a Home */}
+            <Route path="*" element={<Navigate to="/" />} />
           </Route>
-
-          {/* Ruta por defecto */}
-          <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </AuthProvider>
     </Router>

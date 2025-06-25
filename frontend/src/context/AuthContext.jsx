@@ -8,9 +8,9 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = authService.getCurrentUser();
-        if (token) {
-            setUser({ token });
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+            setUser(currentUser);
         }
         setLoading(false);
     }, []);
@@ -25,7 +25,10 @@ export const AuthProvider = ({ children }) => {
             console.log('Login exitoso:', data);
             
             if (data.access_token) {
-                setUser({ token: data.access_token });
+                setUser({
+                    token: data.access_token,
+                    ...data.userData
+                });
                 return { success: true };
             } else {
                 console.error('No se recibió token en la respuesta');
@@ -38,9 +41,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Error en login (context):', error);
             return {
                 success: false,
-                error: error.response?.data?.detail || 
-                       error.message || 
-                       'Error al iniciar sesión'
+                error: error.response?.data?.detail || error.message || 'Error al iniciar sesión'
             };
         }
     };
@@ -53,9 +54,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Error en registro (context):', error);
             return {
                 success: false,
-                error: error.response?.data?.detail || 
-                       error.message || 
-                       'Error al registrar usuario'
+                error: error.response?.data?.detail || error.message || 'Error al registrar usuario'
             };
         }
     };
@@ -71,7 +70,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
+        isAdmin: user?.role === 'admin'
     };
 
     return (
