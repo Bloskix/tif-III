@@ -1,0 +1,17 @@
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+}
+
+.chartContainer {
+    flex: 1;
+    min-height: 0;
+} 
