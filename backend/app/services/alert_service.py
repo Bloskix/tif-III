@@ -165,16 +165,25 @@ class AlertService:
         except Exception as e:
             raise Exception(f"Error al obtener alertas: {str(e)}")
 
-    async def get_daily_alert_stats(self) -> Dict[str, Any]:
+    async def get_weekly_alert_stats(self) -> Dict[str, Any]:
         """
-        Obtiene estadísticas básicas de las alertas del día actual.
+        Obtiene estadísticas de las alertas de la última semana.
         """
         try:
-            # Usar el índice del día actual
-            current_index = self._get_index_pattern()
+            # Calcular fechas para la última semana
+            now = datetime.now()
+            start_of_week = now - timedelta(days=7)
             
             query = {
                 "size": 0,
+                "query": {
+                    "range": {
+                        "@timestamp": {
+                            "gte": start_of_week.isoformat(),
+                            "lte": now.isoformat()
+                        }
+                    }
+                },
                 "aggs": {
                     "rule_levels": {
                         "terms": {
@@ -191,16 +200,29 @@ class AlertService:
                     "alerts_over_time": {
                         "date_histogram": {
                             "field": "@timestamp",
-                            "calendar_interval": "hour"  # Cambiado a horas para vista diaria
+                            "fixed_interval": "1d",
+                            "format": "yyyy-MM-dd",
+                            "min_doc_count": 0,
+                            "extended_bounds": {
+                                "min": start_of_week.strftime("%Y-%m-%d"),
+                                "max": now.strftime("%Y-%m-%d")
+                            }
                         }
                     }
                 }
             }
 
             response = self.client.search(
-                index=current_index,
+                index="wazuh-alerts-*",
                 body=query
             )
+            
+            if response["hits"]["total"]["value"] == 0:
+                return {
+                    "rule_levels": [],
+                    "top_rules": [],
+                    "alerts_over_time": []
+                }
 
             return {
                 "rule_levels": response["aggregations"]["rule_levels"]["buckets"],
@@ -208,15 +230,8 @@ class AlertService:
                 "alerts_over_time": response["aggregations"]["alerts_over_time"]["buckets"]
             }
 
-        except NotFoundError as e:
-            if "index_not_found_exception" in str(e):
-                return {
-                    "message": "No existen alertas para el día actual.",
-                    "error": "index_not_found_exception"
-                }
-            raise Exception(f"Error al obtener estadísticas: {str(e)}")
         except Exception as e:
-            raise Exception(f"Error al obtener estadísticas: {str(e)}")
+            raise Exception(f"Error al obtener estadísticas semanales: {str(e)}")
 
     async def get_monthly_alert_stats(self) -> Dict[str, Any]:
         """
@@ -265,7 +280,13 @@ class AlertService:
                     "alerts_over_time": {
                         "date_histogram": {
                             "field": "@timestamp",
-                            "calendar_interval": "day"
+                            "calendar_interval": "day",
+                            "format": "yyyy-MM-dd",
+                            "min_doc_count": 0,
+                            "extended_bounds": {
+                                "min": first_day.strftime("%Y-%m-%d"),
+                                "max": now.strftime("%Y-%m-%d")
+                            }
                         }
                     }
                 }

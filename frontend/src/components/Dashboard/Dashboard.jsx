@@ -9,7 +9,7 @@ import { alertService } from '../../services/alertService';
 const REFRESH_INTERVAL = 60000; // 1 minuto en milisegundos
 
 const Dashboard = () => {
-  const [period, setPeriod] = useState('daily');
+  const [period, setPeriod] = useState('weekly');
   const [dashboardData, setDashboardData] = useState({
     alertsOverTime: [],
     ruleLevels: [],
@@ -24,6 +24,7 @@ const Dashboard = () => {
       setError(null);
       
       const data = await alertService.getDashboardStats(period);
+      console.log('Datos recibidos del backend:', data.alertsOverTime);
       setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -77,7 +78,7 @@ const Dashboard = () => {
       ) : (
         <div className={styles.chartsGrid}>
           <div className={styles.mainChart}>
-            <AlertsOverTimeChart data={dashboardData.alertsOverTime} />
+            <AlertsOverTimeChart data={dashboardData.alertsOverTime} period={period} />
           </div>
           
           <div className={styles.middleCharts}>

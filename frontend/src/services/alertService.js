@@ -17,7 +17,7 @@ class AlertService {
 
     /**
      * Obtiene las estadísticas del dashboard según el período
-     * @param {string} period - Período de tiempo ('daily' o 'monthly')
+     * @param {string} period - Período de tiempo ('weekly' o 'monthly')
      * @returns {Promise} Datos transformados para los gráficos
      */
     async getDashboardStats(period) {
@@ -29,12 +29,17 @@ class AlertService {
                 throw new Error(response.data.message || 'No hay datos disponibles');
             }
 
+            console.log('Datos crudos del backend (alerts_over_time):', response.data.alerts_over_time);
+
             // Transformar los datos para los gráficos
-            return {
-                alertsOverTime: response.data.alerts_over_time.map(bucket => ({
-                    date: new Date(bucket.key_as_string || bucket.key).toLocaleDateString(),
-                    count: bucket.doc_count
-                })),
+            const transformedData = {
+                alertsOverTime: response.data.alerts_over_time.map(bucket => {
+                    console.log('Procesando bucket:', bucket);
+                    return {
+                        date: bucket.key_as_string || bucket.key,
+                        count: bucket.doc_count
+                    };
+                }),
                 
                 // Pasar los datos de rule_levels sin transformar
                 ruleLevels: response.data.rule_levels,
@@ -44,6 +49,9 @@ class AlertService {
                     count: bucket.doc_count
                 }))
             };
+
+            console.log('Datos transformados para el frontend:', transformedData.alertsOverTime);
+            return transformedData;
         } catch (error) {
             throw this._handleError(error);
         }

@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import styles from './AlertsOverTimeChart.module.css';
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, period }) => {
     if (active && payload && payload.length) {
         return (
             <div className={styles.tooltip}>
@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null;
 };
 
-const AlertsOverTimeChart = ({ data }) => {
+const AlertsOverTimeChart = ({ data, period }) => {
     // Si no hay datos, mostrar mensaje
     if (!data || data.length === 0) {
         return (
@@ -44,6 +44,45 @@ const AlertsOverTimeChart = ({ data }) => {
     const max = Math.max(...data.map(item => item.count));
     const min = Math.min(...data.map(item => item.count));
     const avg = total / data.length;
+
+    // Formatear las fechas según el período
+    const formattedData = data.map(item => {
+        console.log('Fecha original recibida:', item.date);
+        
+        let dateObj;
+        try {
+            // Ahora siempre viene en formato YYYY-MM-DD
+            const [year, month, day] = item.date.split('-').map(Number);
+            dateObj = new Date(year, month - 1, day);
+            
+            console.log('Fecha convertida a objeto Date:', dateObj);
+            
+            if (isNaN(dateObj.getTime())) {
+                console.error('Error: Fecha inválida creada para:', item.date);
+                return {
+                    ...item,
+                    formattedDate: 'Fecha inválida'
+                };
+            }
+            
+            const formattedItem = {
+                ...item,
+                formattedDate: dateObj.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                })
+            };
+            console.log('Fecha formateada final:', formattedItem.formattedDate);
+            return formattedItem;
+        } catch (error) {
+            console.error('Error al procesar la fecha:', error);
+            return {
+                ...item,
+                formattedDate: 'Error en fecha'
+            };
+        }
+    });
 
     return (
         <div className={styles.container}>
@@ -71,7 +110,7 @@ const AlertsOverTimeChart = ({ data }) => {
             <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart
-                        data={data}
+                        data={formattedData}
                         margin={{
                             top: 10,
                             right: 30,
@@ -81,7 +120,7 @@ const AlertsOverTimeChart = ({ data }) => {
                     >
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                         <XAxis
-                            dataKey="date"
+                            dataKey="formattedDate"
                             stroke="#6b7280"
                             fontSize={12}
                             tickLine={false}
@@ -96,7 +135,7 @@ const AlertsOverTimeChart = ({ data }) => {
                             tick={{ fill: '#6b7280' }}
                             tickFormatter={(value) => value.toLocaleString()}
                         />
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip period={period} />} />
                         <Legend 
                             verticalAlign="top"
                             height={36}

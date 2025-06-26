@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './DashboardPeriodSelector.module.css';
 
 const periods = [
-    { value: 'daily', label: 'Diario' },
+    { value: 'weekly', label: 'Semanal' },
     { value: 'monthly', label: 'Mensual' }
 ];
 
