@@ -4,11 +4,15 @@ class ReviewService {
     /**
      * Marca una alerta como abierta para revisión
      * @param {string} alertId - ID de la alerta
+     * @param {Object} alertData - Datos completos de la alerta
      * @returns {Promise} Resultado de la operación
      */
-    async markAlertForReview(alertId) {
+    async markAlertForReview(alertId, alertData) {
         try {
-            const response = await axios.post(`/alerts/${alertId}/review`);
+            const response = await axios.post('/review', {
+                alert_id: alertId,
+                alert_data: alertData
+            });
             return response.data;
         } catch (error) {
             if (error.response) {

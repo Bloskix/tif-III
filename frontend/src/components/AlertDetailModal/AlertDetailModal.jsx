@@ -13,7 +13,23 @@ const AlertDetailModal = ({ alert, onClose, onAlertStatusChange }) => {
         try {
             setIsLoading(true);
             setError(null);
-            await reviewService.markAlertForReview(alert.id);
+            await reviewService.markAlertForReview(alert.id, {
+                id: alert.id,
+                timestamp: alert.timestamp,
+                agent: {
+                    id: alert.agent.id,
+                    name: alert.agent.name,
+                    ip: alert.agent.ip
+                },
+                rule: {
+                    id: alert.rule.id,
+                    level: alert.rule.level,
+                    description: alert.rule.description,
+                    groups: alert.rule.groups || []
+                },
+                full_log: alert.full_log,
+                location: alert.location
+            });
             onAlertStatusChange && onAlertStatusChange(alert.id, 'open');
             onClose();
         } catch (err) {
