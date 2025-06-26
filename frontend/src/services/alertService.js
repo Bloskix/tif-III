@@ -36,12 +36,8 @@ class AlertService {
                     count: bucket.doc_count
                 })),
                 
-                ruleLevels: response.data.rule_levels.map(bucket => ({
-                    level: bucket.key === 3 ? 'Bajo' : 
-                           bucket.key === 7 ? 'Medio' : 
-                           bucket.key === 12 ? 'Alto' : `Nivel ${bucket.key}`,
-                    value: bucket.doc_count
-                })),
+                // Pasar los datos de rule_levels sin transformar
+                ruleLevels: response.data.rule_levels,
                 
                 topRules: response.data.top_rules.map(bucket => ({
                     name: bucket.key,

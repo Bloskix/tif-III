@@ -6,6 +6,8 @@ import RuleLevelsPieChart from './RuleLevelsPieChart/RuleLevelsPieChart';
 import TopRulesBarChart from './TopRulesBarChart/TopRulesBarChart';
 import { alertService } from '../../services/alertService';
 
+const REFRESH_INTERVAL = 60000; // 1 minuto en milisegundos
+
 const Dashboard = () => {
   const [period, setPeriod] = useState('daily');
   const [dashboardData, setDashboardData] = useState({
@@ -16,29 +18,36 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await alertService.getDashboardStats(period);
-        setDashboardData(data);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError(err.message);
-        setDashboardData({
-          alertsOverTime: [],
-          ruleLevels: [],
-          topRules: []
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await alertService.getDashboardStats(period);
+      setDashboardData(data);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err.message);
+      setDashboardData({
+        alertsOverTime: [],
+        ruleLevels: [],
+        topRules: []
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    // Cargar datos inicialmente
     fetchDashboardData();
-  }, [period]);
+
+    // Configurar intervalo de actualización
+    const intervalId = setInterval(fetchDashboardData, REFRESH_INTERVAL);
+
+    // Limpiar intervalo al desmontar
+    return () => clearInterval(intervalId);
+  }, [period]); // Se recrea el intervalo cuando cambia el período
 
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);
@@ -71,12 +80,29 @@ const Dashboard = () => {
             <AlertsOverTimeChart data={dashboardData.alertsOverTime} />
           </div>
           
-          <div className={styles.secondaryCharts}>
+          <div className={styles.middleCharts}>
             <div className={styles.chartCard}>
-              <RuleLevelsPieChart data={dashboardData.ruleLevels} />
+              <div className={styles.ruleLevelLegends}>
+                <RuleLevelsPieChart data={dashboardData.ruleLevels} showOnlyLegends={true} />
+              </div>
             </div>
             <div className={styles.chartCard}>
-              <TopRulesBarChart data={dashboardData.topRules} />
+              <div className={styles.ruleLevelGraphic}>
+                <RuleLevelsPieChart data={dashboardData.ruleLevels} showOnlyGraphic={true} />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.bottomCharts}>
+            <div className={styles.chartCard}>
+              <div className={styles.topRulesGraphic}>
+                <TopRulesBarChart data={dashboardData.topRules} showOnlyGraphic={true} showTitle={true} />
+              </div>
+            </div>
+            <div className={styles.chartCard}>
+              <div className={styles.topRulesLegends}>
+                <TopRulesBarChart data={dashboardData.topRules} showOnlyLegends={true} showTitle={false} />
+              </div>
             </div>
           </div>
         </div>
