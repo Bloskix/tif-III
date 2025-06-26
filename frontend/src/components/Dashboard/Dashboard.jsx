@@ -24,10 +24,8 @@ const Dashboard = () => {
       setError(null);
       
       const data = await alertService.getDashboardStats(period);
-      console.log('Datos recibidos del backend:', data.alertsOverTime);
       setDashboardData(data);
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
       setError(err.message);
       setDashboardData({
         alertsOverTime: [],

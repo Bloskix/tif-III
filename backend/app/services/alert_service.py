@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from app.opensearch.client import opensearch_client
-from app.schemas.alert import Alert, AlertResponse, AlertFilters
+from app.schemas.alert import Alert, AlertResponse, AlertFilters, WazuhAgent, WazuhRule
 from opensearchpy.exceptions import NotFoundError
 
 class AlertService:
@@ -21,32 +21,33 @@ class AlertService:
             str: Patrón de índice para la consulta
             
         Estrategia:
-        1. Si no hay fechas: usar el índice del día actual
-        2. Si hay una fecha inicial pero no final: usar patrón general
-        3. Si el rango es mayor a 31 días: usar patrón general
-        4. Si el rango es corto: listar los índices específicos
+        1. Si no hay fechas: usar el patrón general
+        2. Si hay fechas: generar un patrón que incluya todos los meses en el rango
         """
-        # Caso 1: Sin fechas, usar solo el día actual
+        # Caso 1: Sin fechas, usar patrón general
         if not from_date and not to_date:
-            return f"wazuh-alerts-{datetime.now().strftime('%Y.%m.%d')}"
+            return self.index_pattern
         
         # Caso 2: Solo from_date sin to_date
         if from_date and not to_date:
-            return self.index_pattern
+            year_month = from_date.strftime('%Y.%m')
+            return f"wazuh-alerts-{year_month}.*"
         
-        # Caso 3: Rango completo
+        # Caso 3: Solo to_date sin from_date
+        if to_date and not from_date:
+            year_month = to_date.strftime('%Y.%m')
+            return f"wazuh-alerts-{year_month}.*"
+        
+        # Caso 4: Ambas fechas
         if from_date and to_date:
-            # Si el rango es mayor a 31 días, usar patrón general
-            if (to_date - from_date).days > 31:
-                return self.index_pattern
+            # Si son del mismo mes
+            if from_date.strftime('%Y.%m') == to_date.strftime('%Y.%m'):
+                year_month = from_date.strftime('%Y.%m')
+                return f"wazuh-alerts-{year_month}.*"
             
-            # Para rangos cortos, listar los índices específicos
-            indices = []
-            current_date = from_date
-            while current_date <= to_date:
-                indices.append(f"wazuh-alerts-{current_date.strftime('%Y.%m.%d')}")
-                current_date += timedelta(days=1)
-            return ",".join(indices)
+            # Si son meses diferentes, usar patrón general
+            # Esto asegura que obtengamos todas las alertas en el rango
+            return self.index_pattern
         
         # Caso por defecto: usar patrón general
         return self.index_pattern
@@ -114,46 +115,80 @@ class AlertService:
             query["sort"] = [{"@timestamp": {"order": "desc"}}]
 
             # Obtener el patrón de índice basado en las fechas de filtro
-            index_pattern = self._get_index_pattern(
-                from_date=filters.from_date if filters else None,
-                to_date=filters.to_date if filters else None
-            )
+            try:
+                index_pattern = self._get_index_pattern(
+                    from_date=filters.from_date if filters else None,
+                    to_date=filters.to_date if filters else None
+                )
 
-            # Ejecutar la consulta
-            response = self.client.search(
-                index=index_pattern,
-                body=query
-            )
+
+                # Ejecutar la consulta
+                response = self.client.search(
+                    index=index_pattern,
+                    body=query
+                )
+
+            except NotFoundError:
+                return AlertResponse(
+                    total=0,
+                    alerts=[],
+                    page=page,
+                    size=size
+                )
 
             # Procesar resultados
             total = response["hits"]["total"]["value"]
             alerts = []
 
             for hit in response["hits"]["hits"]:
-                source = hit["_source"]
+                try:
+                    source = hit["_source"]
+                    
+                    # Verificar y estructurar los datos del agente
+                    if "agent" not in source:
+                        continue
 
-                # Verificar que los campos obligatorios existan
-                if "rule" not in source or "agent" not in source or "@timestamp" not in source:
-                    continue  # O puedes loguear el caso para depuración
-
-                # Convertir el timestamp a datetime
-                if isinstance(source.get("@timestamp"), str):
-                    source["timestamp"] = datetime.fromisoformat(
-                        source["@timestamp"].replace("Z", "+00:00")
+                    # Crear objeto WazuhAgent
+                    agent = WazuhAgent(
+                        id=str(source["agent"].get("id", "")),
+                        name=source["agent"].get("name", "Unknown"),
+                        ip=source["agent"].get("ip")
                     )
-                
-                # Crear objeto Alert
-                alert = Alert(
-                    id=hit["_id"],  # Agregamos el ID de OpenSearch
-                    timestamp=source["timestamp"],
-                    agent=source["agent"],
-                    rule=source["rule"],
-                    full_log=source.get("full_log", ""),
-                    location=source.get("location"),
-                    decoder=source.get("decoder"),
-                    data=source.get("data")
-                )
-                alerts.append(alert)
+
+                    # Verificar y estructurar los datos de la regla
+                    if "rule" not in source:
+                        continue
+
+                    # Crear objeto WazuhRule
+                    rule = WazuhRule(
+                        id=str(source["rule"].get("id", "")),
+                        level=int(source["rule"].get("level", 0)),
+                        description=source["rule"].get("description", "No description available"),
+                        groups=source["rule"].get("groups", [])
+                    )
+
+                    # Convertir el timestamp
+                    if "@timestamp" in source:
+                        timestamp = datetime.fromisoformat(
+                            source["@timestamp"].replace("Z", "+00:00")
+                        )
+                    else:
+                        continue
+
+                    # Crear objeto Alert con los objetos validados
+                    alert = Alert(
+                        id=hit["_id"],
+                        timestamp=timestamp,
+                        agent=agent,
+                        rule=rule,
+                        full_log=source.get("full_log", "No log available"),
+                        location=source.get("location"),
+                        decoder=source.get("decoder"),
+                        data=source.get("data")
+                    )
+                    alerts.append(alert)
+                except Exception as e:
+                    continue
 
             return AlertResponse(
                 total=total,
@@ -170,7 +205,6 @@ class AlertService:
         Obtiene estadísticas de las alertas de la última semana.
         """
         try:
-            # Calcular fechas para la última semana
             now = datetime.now()
             start_of_week = now - timedelta(days=7)
             

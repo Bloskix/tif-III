@@ -17,12 +17,8 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (credentials) => {
         try {
-            console.log('Intentando login con credenciales:', {
-                email: credentials.email
-            });
-            
+
             const data = await authService.login(credentials);
-            console.log('Login exitoso:', data);
             
             if (data.access_token) {
                 setUser({

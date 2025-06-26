@@ -8,9 +8,25 @@ class AlertService {
      */
     async getAlerts(params = {}) {
         try {
-            const response = await axios.get('/alerts', { params });
+            console.log('AlertService - Enviando petición con params:', params);
+            console.log('URL completa:', '/alerts/' + '?' + new URLSearchParams(params).toString());
+            
+            const response = await axios.get('/alerts/', { params });
+
+            console.log('perticion al endpoint /alerts/--------------------------------')
+            console.log('AlertService - Respuesta recibida:', {
+                status: response.status,
+                headers: response.headers,
+                data: response.data
+            });
+            
             return response.data;
         } catch (error) {
+            console.error('AlertService - Error en getAlerts:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
             throw this._handleError(error);
         }
     }
@@ -29,12 +45,9 @@ class AlertService {
                 throw new Error(response.data.message || 'No hay datos disponibles');
             }
 
-            console.log('Datos crudos del backend (alerts_over_time):', response.data.alerts_over_time);
-
             // Transformar los datos para los gráficos
             const transformedData = {
                 alertsOverTime: response.data.alerts_over_time.map(bucket => {
-                    console.log('Procesando bucket:', bucket);
                     return {
                         date: bucket.key_as_string || bucket.key,
                         count: bucket.doc_count
@@ -50,8 +63,31 @@ class AlertService {
                 }))
             };
 
-            console.log('Datos transformados para el frontend:', transformedData.alertsOverTime);
             return transformedData;
+        } catch (error) {
+            throw this._handleError(error);
+        }
+    }
+
+    /**
+     * Obtiene los detalles de una alerta específica
+     * @param {string} alertId - ID de la alerta
+     * @returns {Promise} Detalles de la alerta
+     */
+    async getAlertDetails(alertId) {
+        try {
+            const response = await axios.get('/alerts/', {
+                params: {
+                    alert_id: alertId,
+                    page: 1,
+                    size: 1
+                }
+            });
+            // Como es una búsqueda por ID, debería devolver solo una alerta
+            if (response.data.alerts && response.data.alerts.length > 0) {
+                return response.data.alerts[0];
+            }
+            throw new Error('No se encontró la alerta');
         } catch (error) {
             throw this._handleError(error);
         }

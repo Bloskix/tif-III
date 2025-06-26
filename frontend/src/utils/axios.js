@@ -10,11 +10,6 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     (config) => {
-        console.log('Configuración de la solicitud:', {
-            url: config.url,
-            method: config.method,
-            headers: config.headers
-        });
 
         const token = localStorage.getItem('token');
         if (token) {
@@ -28,26 +23,15 @@ axiosInstance.interceptors.request.use(
         return config;
     },
     (error) => {
-        console.error('Error en la solicitud:', error);
         return Promise.reject(error);
     }
 );
 
 axiosInstance.interceptors.response.use(
     (response) => {
-        console.log('Respuesta exitosa:', {
-            url: response.config.url,
-            status: response.status,
-            data: response.data
-        });
         return response;
     },
     async (error) => {
-        console.error('Error en la respuesta:', {
-            url: error.config?.url,
-            status: error.response?.status,
-            data: error.response?.data
-        });
 
         if (error.response?.status === 401) {
             localStorage.removeItem('token');

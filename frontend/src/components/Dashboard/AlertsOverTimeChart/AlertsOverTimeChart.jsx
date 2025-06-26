@@ -47,18 +47,15 @@ const AlertsOverTimeChart = ({ data, period }) => {
 
     // Formatear las fechas según el período
     const formattedData = data.map(item => {
-        console.log('Fecha original recibida:', item.date);
-        
+
         let dateObj;
         try {
             // Ahora siempre viene en formato YYYY-MM-DD
             const [year, month, day] = item.date.split('-').map(Number);
             dateObj = new Date(year, month - 1, day);
             
-            console.log('Fecha convertida a objeto Date:', dateObj);
             
             if (isNaN(dateObj.getTime())) {
-                console.error('Error: Fecha inválida creada para:', item.date);
                 return {
                     ...item,
                     formattedDate: 'Fecha inválida'
@@ -73,10 +70,9 @@ const AlertsOverTimeChart = ({ data, period }) => {
                     day: '2-digit'
                 })
             };
-            console.log('Fecha formateada final:', formattedItem.formattedDate);
+            
             return formattedItem;
         } catch (error) {
-            console.error('Error al procesar la fecha:', error);
             return {
                 ...item,
                 formattedDate: 'Error en fecha'
