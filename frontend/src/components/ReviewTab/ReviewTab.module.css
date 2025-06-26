@@ -1,11 +1,123 @@
 .container {
-  padding: 2rem;
-  text-align: center;
-  min-height: 300px;
+  padding: 20px;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 20px;
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.toggleFiltersButton {
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleFiltersButton:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.viewButton {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.viewButton:hover {
+  color: #0056b3;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.paginationButton {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  color: #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.paginationButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: #6c757d;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.error {
+  color: #dc3545;
+  padding: 20px;
+  text-align: center;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin: 20px;
 }
 
 .title {

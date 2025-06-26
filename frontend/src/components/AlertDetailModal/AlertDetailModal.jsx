@@ -3,34 +3,45 @@ import styles from './AlertDetailModal.module.css';
 import Button from '../Button/Button';
 import { reviewService } from '../../services/reviewService';
 
-const AlertDetailModal = ({ alert, onClose, onAlertStatusChange }) => {
+const AlertDetailModal = ({ alert, onClose, onAlertStateChange }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     if (!alert) return null;
 
+    // Normalizar la estructura de la alerta para manejar tanto alertas normales como gestionadas
+    const normalizedAlert = {
+        id: alert.id,
+        timestamp: alert.timestamp,
+        status: alert.state || alert.status,
+        agent: {
+            id: alert.agent_id || (alert.agent && alert.agent.id),
+            name: alert.agent_name || (alert.agent && alert.agent.name),
+            ip: alert.agent_ip || (alert.agent && alert.agent.ip)
+        },
+        rule: {
+            id: alert.rule_id || (alert.rule && alert.rule.id),
+            level: alert.rule_level || (alert.rule && alert.rule.level),
+            description: alert.rule_description || (alert.rule && alert.rule.description),
+            groups: (alert.rule && alert.rule.groups) || []
+        },
+        full_log: alert.alert_data || alert.full_log,
+        location: alert.location
+    };
+
     const handleMarkForReview = async () => {
         try {
             setIsLoading(true);
             setError(null);
-            await reviewService.markAlertForReview(alert.id, {
-                id: alert.id,
-                timestamp: alert.timestamp,
-                agent: {
-                    id: alert.agent.id,
-                    name: alert.agent.name,
-                    ip: alert.agent.ip
-                },
-                rule: {
-                    id: alert.rule.id,
-                    level: alert.rule.level,
-                    description: alert.rule.description,
-                    groups: alert.rule.groups || []
-                },
-                full_log: alert.full_log,
-                location: alert.location
+            await reviewService.markAlertForReview(normalizedAlert.id, {
+                id: normalizedAlert.id,
+                timestamp: normalizedAlert.timestamp,
+                agent: normalizedAlert.agent,
+                rule: normalizedAlert.rule,
+                full_log: normalizedAlert.full_log,
+                location: normalizedAlert.location
             });
-            onAlertStatusChange && onAlertStatusChange(alert.id, 'open');
+            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'open');
             onClose();
         } catch (err) {
             setError('Error al marcar la alerta para revisión');
@@ -53,20 +64,20 @@ const AlertDetailModal = ({ alert, onClose, onAlertStatusChange }) => {
                         <h3>Información General</h3>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>Fecha:</span>
-                            <span>{new Date(alert.timestamp).toLocaleString()}</span>
+                            <span>{new Date(normalizedAlert.timestamp).toLocaleString()}</span>
                         </div>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>Nivel:</span>
-                            <span>{alert.rule.level}</span>
+                            <span>{normalizedAlert.rule.level}</span>
                         </div>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>ID:</span>
-                            <span>{alert.id}</span>
+                            <span>{normalizedAlert.id}</span>
                         </div>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>Estado:</span>
-                            <span className={`${styles.statusBadge} ${styles[alert.status || 'ignored']}`}>
-                                {alert.status === 'open' ? 'Abierta' : 'Ignorada'}
+                            <span className={`${styles.statusBadge} ${styles[normalizedAlert.status || 'ignored']}`}>
+                                {normalizedAlert.status === 'open' ? 'Abierta' : 'Ignorada'}
                             </span>
                         </div>
                     </div>
@@ -75,30 +86,36 @@ const AlertDetailModal = ({ alert, onClose, onAlertStatusChange }) => {
                         <h3>Agente</h3>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>ID:</span>
-                            <span>{alert.agent.id}</span>
+                            <span>{normalizedAlert.agent.id}</span>
                         </div>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>Nombre:</span>
-                            <span>{alert.agent.name}</span>
+                            <span>{normalizedAlert.agent.name}</span>
                         </div>
+                        {normalizedAlert.agent.ip && (
+                            <div className={styles.detailRow}>
+                                <span className={styles.label}>IP:</span>
+                                <span>{normalizedAlert.agent.ip}</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.detailGroup}>
                         <h3>Regla</h3>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>ID:</span>
-                            <span>{alert.rule.id}</span>
+                            <span>{normalizedAlert.rule.id}</span>
                         </div>
                         <div className={styles.detailRow}>
                             <span className={styles.label}>Descripción:</span>
-                            <span>{alert.rule.description}</span>
+                            <span>{normalizedAlert.rule.description}</span>
                         </div>
                     </div>
 
                     <div className={styles.detailGroup}>
                         <h3>Detalles</h3>
                         <pre className={styles.jsonContent}>
-                            {JSON.stringify(alert.full_log, null, 2)}
+                            {JSON.stringify(normalizedAlert.full_log, null, 2)}
                         </pre>
                     </div>
 
@@ -110,21 +127,15 @@ const AlertDetailModal = ({ alert, onClose, onAlertStatusChange }) => {
                 </div>
 
                 <div className={styles.modalFooter}>
-                    {alert.status !== 'open' && (
+                    {!normalizedAlert.status && (
                         <Button
-                            classNamessName={styles.markForReviewButton}
                             onClick={handleMarkForReview}
                             disabled={isLoading}
+                            className={styles.markForReviewButton}
                         >
-                            {isLoading ? 'Marcando...' : 'Marcar para revisión'}
+                            Marcar para revisión
                         </Button>
                     )}
-                    <Button 
-                        onClick={onClose}
-                        variant="secondary"
-                    >
-                        Cerrar
-                    </Button>
                 </div>
             </div>
         </div>
