@@ -122,6 +122,24 @@ const ReviewTab = () => {
     handleLoadNotes(alertId);
   };
 
+  const handleDeleteAlert = async (alertId) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar esta alerta? Esta acción eliminará también todas las notas asociadas.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await reviewService.deleteManagedAlert(alertId);
+      loadAlerts(); // Recargar la lista después de eliminar
+      setError(null);
+    } catch (err) {
+      console.error('Error al eliminar la alerta:', err);
+      setError('Error al eliminar la alerta: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className={styles.loading}>Cargando alertas en revisión...</div>;
   }
@@ -180,6 +198,13 @@ const ReviewTab = () => {
                       title="Ver/agregar notas"
                     >
                       <i className="fas fa-sticky-note"></i>
+                    </button>
+                    <button 
+                      className={styles.deleteButton}
+                      onClick={() => handleDeleteAlert(alert.id)}
+                      title="Eliminar alerta"
+                    >
+                      <i className="fas fa-trash-alt"></i>
                     </button>
                   </div>
                 </td>

@@ -24,7 +24,7 @@ class ReviewService:
         existing_alert = db.query(ManagedAlert).filter(
             ManagedAlert.alert_id == alert.alert_id
         ).first()
-        if existing_alert:
+        if existing_alert is not None:
             return None
 
         # Crear la alerta gestionada
@@ -93,7 +93,7 @@ class ReviewService:
     ) -> Optional[ManagedAlert]:
         """Actualiza el estado de una alerta gestionada"""
         db_alert = await self.get_managed_alert(db, alert_id)
-        if not db_alert or alert_update.state not in [AlertState.OPEN.value, AlertState.CLOSED.value]:
+        if db_alert is None or alert_update.state not in [AlertState.OPEN.value, AlertState.CLOSED.value]:
             return None
 
         # Actualizar el estado
@@ -112,7 +112,7 @@ class ReviewService:
         """Crea una nueva nota para una alerta gestionada"""
         # Verificar que la alerta existe
         db_alert = await self.get_managed_alert(db, alert_id)
-        if not db_alert:
+        if db_alert is None:
             return None
 
         # Crear la nota
@@ -154,7 +154,7 @@ class ReviewService:
             .filter(AlertNote.id == note_id, AlertNote.alert_id == alert_id)\
             .first()
         
-        if not db_note:
+        if db_note is None:
             return None
 
         # Actualizar la nota
@@ -167,6 +167,39 @@ class ReviewService:
         db.commit()
         db.refresh(db_note)
         return db_note
+
+    async def delete_managed_alert(self, db: Session, alert_id: int) -> bool:
+        """Elimina una alerta gestionada y todas sus notas asociadas"""
+        # Verificar que la alerta existe
+        db_alert = await self.get_managed_alert(db, alert_id)
+        if db_alert is None:
+            return False
+
+        # Eliminar todas las notas asociadas
+        db.query(AlertNote).filter(AlertNote.alert_id == alert_id).delete()
+        
+        # Eliminar la alerta
+        db.delete(db_alert)
+        db.commit()
+        return True
+
+    async def delete_alert_note(self, db: Session, alert_id: int, note_id: int, author_id: int) -> bool:
+        """Elimina una nota de una alerta gestionada"""
+        # Verificar que la nota existe y pertenece a la alerta
+        db_note = db.query(AlertNote)\
+            .filter(AlertNote.id == note_id, AlertNote.alert_id == alert_id)\
+            .first()
+        
+        if db_note is None:
+            return False
+
+        author_matches = getattr(db_note, 'author_id') == author_id
+        if not author_matches:
+            return False
+
+        db.delete(db_note)
+        db.commit()
+        return True
 
 # Instancia global del servicio
 review_service = ReviewService() 

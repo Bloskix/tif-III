@@ -5,6 +5,8 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,113 +15,123 @@
 
 .modalContent {
     background: white;
-    padding: 2rem;
+    padding: 20px;
     border-radius: 8px;
-    width: 90%;
+    width: 80%;
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #333;
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 20px;
 }
 
 .modalHeader h2 {
+    color: #333;
     margin: 0;
     font-size: 1.5rem;
-    color: #1f2937;
 }
 
 .markForReviewButton {
-    background-color: #3b82f6;
+    background-color: #4CAF50;
     color: white;
-    border: none;
-    border: 1px solid #d1d5db;
 }
 
 .closeButton {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 24px;
     cursor: pointer;
-    color: #6b7280;
-    padding: 0.5rem;
+    padding: 0;
+    color: #666;
 }
 
 .closeButton:hover {
-    color: #1f2937;
+    color: #000;
 }
 
 .modalBody {
-    margin-bottom: 2rem;
+    margin-bottom: 20px;
+    color: #333;
 }
 
 .detailGroup {
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
 }
 
 .detailGroup h3 {
-    color: #374151;
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 10px;
+    color: #333;
 }
 
 .detailRow {
     display: flex;
+    margin-bottom: 8px;
     color: #333;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    background-color: #f9fafb;
-    border-radius: 4px;
+}
+
+.detailRow span {
+    color: #333;
 }
 
 .label {
-    font-weight: 600;
-    width: 150px;
-    color: #4b5563;
+    font-weight: bold;
+    width: 120px;
+    color: #666;
 }
 
 .jsonContent {
-    background-color: #f9fafb;
-    color: #333;
-    padding: 1rem;
+    background: #f5f5f5;
+    padding: 10px;
     border-radius: 4px;
     overflow-x: auto;
     font-family: monospace;
-    font-size: 0.9rem;
     white-space: pre-wrap;
+    color: #333;
 }
 
 .modalFooter {
     display: flex;
+    gap: 10px;
     justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+}
+
+.closeAlertButton {
+    background-color: #f44336;
+    color: white;
+}
+
+.error {
+    color: #f44336;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #ffebee;
+    border-radius: 4px;
 }
 
 .statusBadge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
 }
 
-.statusBadge.ignored {
-    background-color: #fee2e2;
-    color: #991b1b;
+.abierta {
+    background-color: #4CAF50;
+    color: white;
 }
 
-.statusBadge.open {
-    background-color: #dbeafe;
-    color: #1e40af;
+.cerrada {
+    background-color: #f44336;
+    color: white;
+}
+
+.ignored {
+    background-color: #9e9e9e;
+    color: white;
 } 

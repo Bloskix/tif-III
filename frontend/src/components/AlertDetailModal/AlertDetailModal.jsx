@@ -51,6 +51,21 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) =
         }
     };
 
+    const handleCloseAlert = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            await reviewService.updateAlertState(normalizedAlert.id, 'cerrada');
+            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'cerrada');
+            onClose();
+        } catch (err) {
+            setError('Error al cerrar la alerta');
+            console.error('Error:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
@@ -78,7 +93,8 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) =
                             <div className={styles.detailRow}>
                                 <span className={styles.label}>Estado:</span>
                                 <span className={`${styles.statusBadge} ${styles[normalizedAlert.status || 'ignored']}`}>
-                                    {normalizedAlert.status === 'abierta' ? 'Abierta' : 'Ignorada'}
+                                    {normalizedAlert.status === 'abierta' ? 'Abierta' : 
+                                     normalizedAlert.status === 'cerrada' ? 'Cerrada' : 'Ignorada'}
                                 </span>
                             </div>
                         )}
@@ -136,6 +152,15 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) =
                             className={styles.markForReviewButton}
                         >
                             Marcar para revisión
+                        </Button>
+                    )}
+                    {isReviewTab && normalizedAlert.status === 'abierta' && (
+                        <Button
+                            onClick={handleCloseAlert}
+                            disabled={isLoading}
+                            className={styles.closeAlertButton}
+                        >
+                            Cerrar Alerta
                         </Button>
                     )}
                 </div>

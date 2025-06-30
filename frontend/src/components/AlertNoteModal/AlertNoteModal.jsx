@@ -54,6 +54,25 @@ const AlertNoteModal = ({ alertId, onClose, notes, loadingNotes, notesError }) =
         }
     };
 
+    const handleDeleteNote = async (noteId) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar esta nota?')) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await reviewService.deleteAlertNote(alertId, noteId);
+            // Recargar las notas
+            if (onClose) {
+                onClose(true);
+            }
+        } catch (err) {
+            setError('Error al eliminar la nota: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const formatDate = (dateString) => {
         return format(new Date(dateString), 'dd/MM/yyyy', { locale: es });
     };
@@ -81,13 +100,22 @@ const AlertNoteModal = ({ alertId, onClose, notes, loadingNotes, notesError }) =
                                         <span className={styles.noteAuthor}>{note.author.name}</span>
                                         <span className={styles.noteDate}>{formatDate(note.created_at)}</span>
                                     </div>
-                                    <button 
-                                        className={styles.editButton}
-                                        onClick={() => handleEditClick(note)}
-                                        title="Editar nota"
-                                    >
-                                        <i className="fas fa-pencil-alt"></i>
-                                    </button>
+                                    <div className={styles.noteActions}>
+                                        <button 
+                                            className={styles.editButton}
+                                            onClick={() => handleEditClick(note)}
+                                            title="Editar nota"
+                                        >
+                                            <i className="fas fa-pencil-alt"></i>
+                                        </button>
+                                        <button 
+                                            className={styles.deleteButton}
+                                            onClick={() => handleDeleteNote(note.id)}
+                                            title="Eliminar nota"
+                                        >
+                                            <i className="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 {editingNoteId === note.id ? (
                                     <div className={styles.editForm}>

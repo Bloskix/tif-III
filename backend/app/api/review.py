@@ -162,4 +162,42 @@ async def update_alert_note(
             status_code=404,
             detail="Nota no encontrada o no tienes permiso para modificarla"
         )
-    return result 
+    return result
+
+@router.delete("/{alert_id}")
+async def delete_managed_alert(
+    alert_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Elimina una alerta gestionada y todas sus notas asociadas.
+    """
+    result = await review_service.delete_managed_alert(db=db, alert_id=alert_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Alerta no encontrada")
+    return {"message": "Alerta eliminada correctamente"}
+
+@router.delete("/{alert_id}/notes/{note_id}")
+async def delete_alert_note(
+    alert_id: int,
+    note_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Elimina una nota de una alerta gestionada.
+    Solo el autor original puede eliminar la nota.
+    """
+    result = await review_service.delete_alert_note(
+        db=db,
+        alert_id=alert_id,
+        note_id=note_id,
+        author_id=current_user.id
+    )
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="Nota no encontrada o no tienes permiso para eliminarla"
+        )
+    return {"message": "Nota eliminada correctamente"} 

@@ -1,4 +1,4 @@
-import axios from '../utils/axios';
+import api from '../utils/axios';
 
 class ReviewService {
     /**
@@ -8,7 +8,7 @@ class ReviewService {
      */
     async getManagedAlerts(params) {
         try {
-            const response = await axios.get('/review', { params });
+            const response = await api.get('/review', { params });
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -25,7 +25,7 @@ class ReviewService {
      */
     async getManagedAlertDetails(alertId) {
         try {
-            const response = await axios.get(`/review/${alertId}`);
+            const response = await api.get(`/review/${alertId}`);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -42,18 +42,11 @@ class ReviewService {
      * @returns {Promise} Resultado de la operación
      */
     async markAlertForReview(alertId, alertData) {
-        try {
-            const response = await axios.post('/review', {
-                alert_id: alertId,
-                alert_data: alertData
-            });
-            return response.data;
-        } catch (error) {
-            if (error.response) {
-                throw new Error(error.response.data.detail || 'Error al marcar la alerta para revisión');
-            }
-            throw new Error('No se pudo conectar con el servidor');
-        }
+        const response = await api.post('/review', {
+            alert_id: alertId,
+            alert_data: alertData
+        });
+        return response.data;
     }
 
     /**
@@ -64,7 +57,7 @@ class ReviewService {
      */
     async updateManagedAlertState(alertId, state) {
         try {
-            const response = await axios.put(`/review/${alertId}`, {
+            const response = await api.put(`/review/${alertId}`, {
                 state: state
             });
             return response.data;
@@ -79,7 +72,7 @@ class ReviewService {
     // Métodos para manejar notas de alertas
     async getAlertNotes(alertId) {
         try {
-            const response = await axios.get(`/review/${alertId}/notes`);
+            const response = await api.get(`/review/${alertId}/notes`);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -91,7 +84,7 @@ class ReviewService {
 
     async addAlertNote(alertId, noteData) {
         try {
-            const response = await axios.post(`/review/${alertId}/notes`, noteData);
+            const response = await api.post(`/review/${alertId}/notes`, noteData);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -103,7 +96,7 @@ class ReviewService {
 
     async updateAlertNote(alertId, noteId, noteData) {
         try {
-            const response = await axios.put(`/review/${alertId}/notes/${noteId}`, noteData);
+            const response = await api.put(`/review/${alertId}/notes/${noteId}`, noteData);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -111,6 +104,23 @@ class ReviewService {
             }
             throw new Error('No se pudo conectar con el servidor');
         }
+    }
+
+    async updateAlertState(alertId, state) {
+        const response = await api.put(`/review/${alertId}`, {
+            state: state
+        });
+        return response.data;
+    }
+
+    async deleteAlertNote(alertId, noteId) {
+        const response = await api.delete(`/review/${alertId}/notes/${noteId}`);
+        return response.data;
+    }
+
+    async deleteManagedAlert(alertId) {
+        const response = await api.delete(`/review/${alertId}`);
+        return response.data;
     }
 }
 
