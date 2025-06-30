@@ -9,7 +9,7 @@ from app.schemas.managed_alert import (
     ManagedAlertResponse,
     ManagedAlertInDB
 )
-from app.schemas.alert_note import AlertNoteCreate, AlertNoteInDB
+from app.schemas.alert_note import AlertNoteCreate, AlertNoteUpdate, AlertNoteInDB
 from app.models.user import User
 from app.models.managed_alert import AlertState
 from app.services.review_service import review_service
@@ -135,4 +135,31 @@ async def get_alert_notes(
     if not alert:
         raise HTTPException(status_code=404, detail="Alerta no encontrada")
     
-    return await review_service.get_alert_notes(db=db, alert_id=alert_id) 
+    return await review_service.get_alert_notes(db=db, alert_id=alert_id)
+
+@router.put("/{alert_id}/notes/{note_id}", response_model=AlertNoteInDB)
+async def update_alert_note(
+    *,
+    alert_id: int,
+    note_id: int,
+    note: AlertNoteUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Actualiza una nota de una alerta gestionada.
+    Solo el autor original puede modificar la nota.
+    """
+    result = await review_service.update_alert_note(
+        db=db,
+        alert_id=alert_id,
+        note_id=note_id,
+        note_update=note,
+        author_id=current_user.id
+    )
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="Nota no encontrada o no tienes permiso para modificarla"
+        )
+    return result 

@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import AlertsFilters from '../AlertsFilters/AlertsFilters';
 import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
+import AlertNoteModal from '../AlertNoteModal/AlertNoteModal';
 
 const ReviewTab = () => {
   const [alerts, setAlerts] = useState([]);
@@ -15,6 +16,10 @@ const ReviewTab = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState({});
   const [selectedAlert, setSelectedAlert] = useState(null);
+  const [selectedAlertForNotes, setSelectedAlertForNotes] = useState(null);
+  const [alertNotes, setAlertNotes] = useState([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [notesError, setNotesError] = useState(null);
   const PAGE_SIZE = 10;
 
   useEffect(() => {
@@ -27,6 +32,7 @@ const ReviewTab = () => {
       const response = await reviewService.getManagedAlerts({
         page: currentPage,
         size: PAGE_SIZE,
+        state: 'abierta',
         ...activeFilters
       });
 
@@ -97,6 +103,25 @@ const ReviewTab = () => {
     }
   };
 
+  const handleLoadNotes = async (alertId) => {
+    setLoadingNotes(true);
+    setNotesError(null);
+    try {
+      const notes = await reviewService.getAlertNotes(alertId);
+      setAlertNotes(notes);
+    } catch (error) {
+      setNotesError(error.message);
+      setAlertNotes([]);
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleNotesClick = (alertId) => {
+    setSelectedAlertForNotes(alertId);
+    handleLoadNotes(alertId);
+  };
+
   if (loading) {
     return <div className={styles.loading}>Cargando alertas en revisión...</div>;
   }
@@ -141,12 +166,22 @@ const ReviewTab = () => {
                 <td>{alert.rule_description}</td>
                 <td>{alert.rule_level}</td>
                 <td>
-                  <button 
-                    className={styles.viewButton}
-                    onClick={() => handleViewAlert(alert.id)}
-                  >
-                    <i className="fas fa-eye"></i>
-                  </button>
+                  <div className={styles.actionButtons}>
+                    <button 
+                      className={styles.viewButton}
+                      onClick={() => handleViewAlert(alert.id)}
+                      title="Ver detalles"
+                    >
+                      <i className="fas fa-eye"></i>
+                    </button>
+                    <button 
+                      className={styles.notesButton}
+                      onClick={() => handleNotesClick(alert.id)}
+                      title="Ver/agregar notas"
+                    >
+                      <i className="fas fa-sticky-note"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -179,6 +214,22 @@ const ReviewTab = () => {
           alert={selectedAlert}
           onClose={handleCloseModal}
           onAlertStateChange={handleAlertStateChange}
+          isReviewTab={true}
+        />
+      )}
+
+      {selectedAlertForNotes && (
+        <AlertNoteModal
+          alertId={selectedAlertForNotes}
+          notes={alertNotes}
+          loadingNotes={loadingNotes}
+          notesError={notesError}
+          onClose={(shouldReload) => {
+            if (shouldReload) {
+              handleLoadNotes(selectedAlertForNotes);
+            }
+            setSelectedAlertForNotes(null);
+          }}
         />
       )}
     </div>

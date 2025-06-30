@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 from .user import UserBase
 
 class AlertNoteBase(BaseModel):
@@ -11,14 +11,17 @@ class AlertNoteCreate(AlertNoteBase):
     """Esquema para crear una nota de alerta"""
     pass
 
+class AlertNoteUpdate(AlertNoteBase):
+    pass
+
 class AlertNoteInDB(AlertNoteBase):
     """Esquema para representar una nota de alerta en la base de datos"""
-    id: int = Field(..., description="ID de la nota")
-    alert_id: int = Field(..., description="ID de la alerta gestionada")
-    author_id: int = Field(..., description="ID del autor")
-    author: UserBase = Field(..., description="Información del autor")
-    created_at: datetime = Field(..., description="Fecha de creación")
-    updated_at: datetime = Field(..., description="Fecha de última actualización")
+    id: int
+    alert_id: int
+    author_id: int
+    author: Optional[UserBase] = None
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True 

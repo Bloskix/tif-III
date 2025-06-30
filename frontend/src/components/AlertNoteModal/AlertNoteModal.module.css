@@ -1,0 +1,169 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.5rem;
+}
+
+.closeButton:hover {
+  color: #1f2937;
+}
+
+.notesList {
+  margin-bottom: 2rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+.noteItem {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.noteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.noteAuthor {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.noteDate {
+  color: #6b7280;
+}
+
+.noteContent {
+  margin: 0;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.noteForm {
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.noteInput {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.submitButton {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.submitButton:hover {
+  background-color: #1d4ed8;
+}
+
+.submitButton:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+.error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.noNotes {
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.noteActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.editButton:hover {
+  color: #4b5563;
+}
+
+.editButton i {
+  margin-right: 0.25rem;
+} 

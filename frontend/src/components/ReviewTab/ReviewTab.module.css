@@ -57,17 +57,30 @@
   background-color: #f8f9fa;
 }
 
-.viewButton {
+.viewButton,
+.notesButton {
   background: none;
   border: none;
-  color: #007bff;
   cursor: pointer;
-  padding: 5px;
-  transition: color 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.viewButton {
+  color: #007bff;
+}
+
+.notesButton {
+  color: #28a745;
 }
 
 .viewButton:hover {
-  color: #0056b3;
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.notesButton:hover {
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
 .pagination {
@@ -141,4 +154,10 @@
 
 .featureList li {
   margin-bottom: 0.5rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
 } 

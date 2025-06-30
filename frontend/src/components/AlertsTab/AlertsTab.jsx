@@ -163,6 +163,7 @@ const AlertsTab = () => {
                   <button 
                     className={styles.viewButton}
                     onClick={() => handleViewAlert(alert.id)}
+                    title="Ver detalles"
                   >
                     <i className="fas fa-eye"></i>
                   </button>
@@ -198,6 +199,7 @@ const AlertsTab = () => {
           alert={selectedAlert}
           onClose={handleCloseModal}
           onAlertStatusChange={handleAlertStatusChange}
+          isReviewTab={false}
         />
       )}
     </div>

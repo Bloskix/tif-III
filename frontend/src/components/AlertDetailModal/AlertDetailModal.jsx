@@ -3,7 +3,7 @@ import styles from './AlertDetailModal.module.css';
 import Button from '../Button/Button';
 import { reviewService } from '../../services/reviewService';
 
-const AlertDetailModal = ({ alert, onClose, onAlertStateChange }) => {
+const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -41,7 +41,7 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange }) => {
                 full_log: normalizedAlert.full_log,
                 location: normalizedAlert.location
             });
-            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'open');
+            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'abierta');
             onClose();
         } catch (err) {
             setError('Error al marcar la alerta para revisión');
@@ -74,12 +74,14 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange }) => {
                             <span className={styles.label}>ID:</span>
                             <span>{normalizedAlert.id}</span>
                         </div>
-                        <div className={styles.detailRow}>
-                            <span className={styles.label}>Estado:</span>
-                            <span className={`${styles.statusBadge} ${styles[normalizedAlert.status || 'ignored']}`}>
-                                {normalizedAlert.status === 'open' ? 'Abierta' : 'Ignorada'}
-                            </span>
-                        </div>
+                        {isReviewTab && (
+                            <div className={styles.detailRow}>
+                                <span className={styles.label}>Estado:</span>
+                                <span className={`${styles.statusBadge} ${styles[normalizedAlert.status || 'ignored']}`}>
+                                    {normalizedAlert.status === 'abierta' ? 'Abierta' : 'Ignorada'}
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.detailGroup}>

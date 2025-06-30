@@ -5,7 +5,7 @@ from datetime import datetime
 from app.models.managed_alert import ManagedAlert, AlertState
 from app.models.alert_note import AlertNote
 from app.schemas.managed_alert import ManagedAlertCreate, ManagedAlertUpdate, ManagedAlertResponse, ManagedAlertInDB
-from app.schemas.alert_note import AlertNoteCreate
+from app.schemas.alert_note import AlertNoteCreate, AlertNoteUpdate
 
 class ReviewService:
     def _serialize_datetime(self, obj: Any) -> Any:
@@ -139,6 +139,34 @@ class ReviewService:
             .filter(AlertNote.alert_id == alert_id)\
             .order_by(desc(AlertNote.created_at))\
             .all()
+
+    async def update_alert_note(
+        self,
+        db: Session,
+        alert_id: int,
+        note_id: int,
+        note_update: AlertNoteUpdate,
+        author_id: int
+    ) -> Optional[AlertNote]:
+        """Actualiza una nota de una alerta gestionada"""
+        # Verificar que la nota existe y pertenece a la alerta
+        db_note = db.query(AlertNote)\
+            .filter(AlertNote.id == note_id, AlertNote.alert_id == alert_id)\
+            .first()
+        
+        if not db_note:
+            return None
+
+        # Actualizar la nota
+        for key, value in note_update.model_dump().items():
+            setattr(db_note, key, value)
+        
+        # Actualizar el autor al último usuario que modificó la nota
+        setattr(db_note, 'author_id', author_id)
+
+        db.commit()
+        db.refresh(db_note)
+        return db_note
 
 # Instancia global del servicio
 review_service = ReviewService() 

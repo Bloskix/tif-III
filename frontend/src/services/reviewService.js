@@ -75,6 +75,43 @@ class ReviewService {
             throw new Error('No se pudo conectar con el servidor');
         }
     }
+
+    // Métodos para manejar notas de alertas
+    async getAlertNotes(alertId) {
+        try {
+            const response = await axios.get(`/review/${alertId}/notes`);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                throw new Error(error.response.data.detail || 'Error al obtener las notas de la alerta');
+            }
+            throw new Error('No se pudo conectar con el servidor');
+        }
+    }
+
+    async addAlertNote(alertId, noteData) {
+        try {
+            const response = await axios.post(`/review/${alertId}/notes`, noteData);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                throw new Error(error.response.data.detail || 'Error al agregar la nota');
+            }
+            throw new Error('No se pudo conectar con el servidor');
+        }
+    }
+
+    async updateAlertNote(alertId, noteId, noteData) {
+        try {
+            const response = await axios.put(`/review/${alertId}/notes/${noteId}`, noteData);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                throw new Error(error.response.data.detail || 'Error al actualizar la nota');
+            }
+            throw new Error('No se pudo conectar con el servidor');
+        }
+    }
 }
 
 export const reviewService = new ReviewService(); 
