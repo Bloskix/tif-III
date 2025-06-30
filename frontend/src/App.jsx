@@ -1,8 +1,10 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import HomePage from './pages/home/HomePage';
+import ReviewPage from './pages/review/ReviewPage';
 import publicStyles from './layouts/PublicLayout.module.css';
 import './App.css';
 
@@ -42,8 +44,8 @@ const PrivateLayout = () => {
 
 const App = () => {
   return (
-    <Router>
-      <AuthProvider>
+    <AuthProvider>
+      <Router>
         <Routes>
           {/* Rutas Públicas */}
           <Route element={<PublicLayout />}>
@@ -55,15 +57,15 @@ const App = () => {
           <Route element={<PrivateLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/alerts" element={<HomePage />} />
-            <Route path="/review" element={<HomePage />} />
+            <Route path="/review" element={<ReviewPage />} />
             <Route path="/settings" element={<HomePage />} />
             <Route path="/me" element={<HomePage />} />
             {/* Redirigir cualquier otra ruta a Home */}
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
         </Routes>
-      </AuthProvider>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 };
 

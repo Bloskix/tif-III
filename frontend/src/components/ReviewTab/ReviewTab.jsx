@@ -7,7 +7,7 @@ import AlertsFilters from '../AlertsFilters/AlertsFilters';
 import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
 import AlertNoteModal from '../AlertNoteModal/AlertNoteModal';
 
-const ReviewTab = () => {
+const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ const ReviewTab = () => {
       const response = await reviewService.getManagedAlerts({
         page: currentPage,
         size: PAGE_SIZE,
-        state: 'abierta',
+        state: state,
         ...activeFilters
       });
 
@@ -192,13 +192,15 @@ const ReviewTab = () => {
                     >
                       <i className="fas fa-eye"></i>
                     </button>
-                    <button 
-                      className={styles.notesButton}
-                      onClick={() => handleNotesClick(alert.id)}
-                      title="Ver/agregar notas"
-                    >
-                      <i className="fas fa-sticky-note"></i>
-                    </button>
+                    {showNotes && (
+                      <button 
+                        className={styles.notesButton}
+                        onClick={() => handleNotesClick(alert.id)}
+                        title="Ver/agregar notas"
+                      >
+                        <i className="fas fa-sticky-note"></i>
+                      </button>
+                    )}
                     <button 
                       className={styles.deleteButton}
                       onClick={() => handleDeleteAlert(alert.id)}
@@ -243,7 +245,7 @@ const ReviewTab = () => {
         />
       )}
 
-      {selectedAlertForNotes && (
+      {showNotes && selectedAlertForNotes && (
         <AlertNoteModal
           alertId={selectedAlertForNotes}
           notes={alertNotes}
