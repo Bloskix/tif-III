@@ -1,0 +1,326 @@
+.notificacionesPanel {
+  padding: 2rem;
+}
+
+.notificacionesPanel h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.loading {
+  color: #4a5568;
+  font-size: 0.875rem;
+}
+
+.error {
+  background-color: #fed7d7;
+  color: #c53030;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.success {
+  background-color: #c6f6d5;
+  color: #2f855a;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.labelWithInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.infoIcon {
+  position: relative;
+  cursor: help;
+  color: #4a5568;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2d3748;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  width: max-content;
+  max-width: 300px;
+  z-index: 10;
+  margin-bottom: 0.5rem;
+}
+
+.emailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.emailCard {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  position: relative;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emailCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.emailCard.toDelete {
+  opacity: 0.5;
+  background-color: #fee2e2;
+}
+
+.emailInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.emailText {
+  font-size: 1rem;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.descriptionText {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.statusText {
+  font-size: 0.875rem;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.emailActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.editButton {
+  color: #4a5568;
+}
+
+.editButton:hover {
+  color: #2b6cb0;
+  background-color: #ebf8ff;
+}
+
+.deleteButton {
+  color: #4a5568;
+}
+
+.deleteButton:hover {
+  color: #c53030;
+  background-color: #fed7d7;
+}
+
+.deleteConfirm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  gap: 1rem;
+}
+
+.deleteConfirm p {
+  color: #2d3748;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.deleteActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.confirmButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.confirmButton {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #c53030;
+}
+
+.cancelButton {
+  background-color: #edf2f7;
+  color: #4a5568;
+}
+
+.cancelButton:hover {
+  background-color: #e2e8f0;
+}
+
+.emailStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.emailStatus label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.emailStatus input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+}
+
+.removeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #718096;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.removeButton:hover {
+  color: #e53e3e;
+  background-color: #fed7d7;
+}
+
+.addEmailPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 150px;
+  cursor: pointer;
+  color: #718096;
+  transition: all 0.2s;
+}
+
+.addEmailPlaceholder:hover {
+  color: #4a5568;
+  background-color: #f7fafc;
+}
+
+.addEmailPlaceholder span {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.addEmailPlaceholder p {
+  font-size: 0.875rem;
+}
+
+.formActions {
+  margin-top: 2rem;
+}
+
+.newEmailActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.saveButton,
+.cancelButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  line-height: 1;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.saveButton {
+  color: #2f855a;
+}
+
+.saveButton:hover {
+  background-color: #c6f6d5;
+}
+
+.cancelButton {
+  color: #e53e3e;
+}
+
+.cancelButton:hover {
+  background-color: #fed7d7;
+} 

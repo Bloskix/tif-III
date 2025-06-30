@@ -5,6 +5,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import HomePage from './pages/home/HomePage';
 import ReviewPage from './pages/review/ReviewPage';
+import SettingsPage from './pages/settings/SettingsPage';
 import publicStyles from './layouts/PublicLayout.module.css';
 import './App.css';
 
@@ -42,6 +43,29 @@ const PrivateLayout = () => {
   return <Outlet />;
 };
 
+// Layout para rutas de admin
+const AdminLayout = () => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
+};
+
 const App = () => {
   return (
     <AuthProvider>
@@ -53,12 +77,16 @@ const App = () => {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
+          {/* Rutas de Admin */}
+          <Route element={<AdminLayout />}>
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
+
           {/* Rutas Privadas */}
           <Route element={<PrivateLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/alerts" element={<HomePage />} />
             <Route path="/review" element={<ReviewPage />} />
-            <Route path="/settings" element={<HomePage />} />
             <Route path="/me" element={<HomePage />} />
             {/* Redirigir cualquier otra ruta a Home */}
             <Route path="*" element={<Navigate to="/" />} />
