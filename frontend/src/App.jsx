@@ -6,6 +6,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import HomePage from './pages/home/HomePage';
 import ReviewPage from './pages/review/ReviewPage';
 import SettingsPage from './pages/settings/SettingsPage';
+import MePage from './pages/me/MePage';
 import publicStyles from './layouts/PublicLayout.module.css';
 import './App.css';
 
@@ -87,7 +88,7 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/alerts" element={<HomePage />} />
             <Route path="/review" element={<ReviewPage />} />
-            <Route path="/me" element={<HomePage />} />
+            <Route path="/me" element={<MePage />} />
             {/* Redirigir cualquier otra ruta a Home */}
             <Route path="*" element={<Navigate to="/" />} />
           </Route>

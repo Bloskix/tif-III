@@ -65,6 +65,38 @@ const userService = {
                 error: error.response?.data?.detail || 'Error al actualizar el usuario'
             };
         }
+    },
+
+    // Obtener usuario actual
+    getCurrentUser: async () => {
+        try {
+            const response = await axiosInstance.get('/users/me');
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.detail || 'Error al obtener el usuario actual'
+            };
+        }
+    },
+
+    // Actualizar usuario actual
+    updateCurrentUser: async (userData) => {
+        try {
+            const response = await axiosInstance.put('/users/me', userData);
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.detail || 'Error al actualizar el perfil'
+            };
+        }
     }
 };
 

@@ -1,0 +1,145 @@
+.root {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.avatarSection {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.avatar {
+    width: 72px;
+    height: 72px;
+    color: #6b7280;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.infoSection {
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.infoItem:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.infoValue {
+    color: #111827;
+    font-weight: 500;
+}
+
+.statusBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.active {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.inactive {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formLabel {
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.error {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.success {
+    background-color: #f0fdf4;
+    border: 1px solid #dcfce7;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    color: #16a34a;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .content {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 1rem;
+    }
+
+    .infoSection {
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+} 
