@@ -4,14 +4,21 @@ import {
     Pie,
     Cell,
     ResponsiveContainer,
-    Tooltip
+    Tooltip,
+    Legend
 } from 'recharts';
 import styles from './RuleLevelsPieChart.module.css';
 
 const COLORS = {
-    alto: '#ef4444',    // Rojo para nivel >= 10
-    medio: '#f59e0b',   // Amarillo para 5 <= nivel < 10
-    bajo: '#10b981',    // Verde para nivel < 5
+    alto: '#ef4444',
+    medio: '#f59e0b',
+    bajo: '#10b981',
+};
+
+const LEVEL_LABELS = {
+    bajo: 'Nivel Bajo',
+    medio: 'Nivel Medio',
+    alto: 'Nivel Alto'
 };
 
 const getLevelCategory = (level) => {
@@ -24,7 +31,7 @@ const RuleLevelsPieChart = ({ data, showOnlyLegends = false, showOnlyGraphic = f
     if (!data || data.length === 0) {
         return (
             <div className={styles.container}>
-                {!showOnlyGraphic && <h3 className={styles.title}>Distribución por Nivel</h3>}
+                {!showOnlyGraphic && <h3 className={styles.title}>Distribución por Nivel de Riesgo</h3>}
                 <div className={styles.noData}>
                     No hay datos disponibles para mostrar
                 </div>
@@ -32,48 +39,68 @@ const RuleLevelsPieChart = ({ data, showOnlyLegends = false, showOnlyGraphic = f
         );
     }
 
-    // Agrupar los datos por categoría de nivel
-    const groupedData = data.reduce((acc, item) => {
-        const category = getLevelCategory(item.key);
-        acc[category] = (acc[category] || 0) + item.doc_count;
-        return acc;
-    }, {});
+    const processData = () => {
+        const groupedData = data.reduce((acc, item) => {
+            const category = getLevelCategory(item.key);
+            acc[category] = (acc[category] || 0) + item.doc_count;
+            return acc;
+        }, {});
 
-    const total = Object.values(groupedData).reduce((sum, value) => sum + value, 0);
+        const total = Object.values(groupedData).reduce((sum, value) => sum + value, 0);
 
-    // Preparar los datos para el gráfico
-    const chartData = Object.entries(groupedData)
-        .filter(([_, value]) => value > 0)
-        .map(([key, value]) => ({
-            name: key,
-            value,
-            percentage: ((value / total) * 100).toFixed(1)
-        }));
+        const chartData = Object.entries(groupedData)
+            .filter(([_, value]) => value > 0)
+            .map(([key, value]) => ({
+                name: key,
+                value,
+                percentage: ((value / total) * 100).toFixed(1)
+            }));
 
-    // Preparar los datos para las leyendas
-    const legendData = data.map(item => ({
-        level: item.key,
-        value: item.doc_count,
-        percentage: ((item.doc_count / total) * 100).toFixed(1)
-    })).sort((a, b) => b.value - a.value);
+        const legendData = data
+            .map(item => ({
+                level: item.key,
+                category: getLevelCategory(item.key),
+                value: item.doc_count,
+                percentage: ((item.doc_count / total) * 100).toFixed(1)
+            }))
+            .sort((a, b) => b.value - a.value);
 
-    const renderLegends = () => (
-        <div className={styles.stats}>
-            {legendData.map(({ level, value, percentage }) => (
-                <div key={level} className={styles.statItem}>
-                    <span 
-                        className={styles.statDot}
-                        style={{ backgroundColor: COLORS[getLevelCategory(level)] }}
-                    />
-                    <span className={styles.statLabel}>Nivel {level}:</span>
-                    <span className={styles.statValue}>
-                        {value}
-                        <span className={styles.statPercentage}>
-                            ({percentage}%)
-                        </span>
-                    </span>
-                </div>
-            ))}
+        return { chartData, legendData };
+    };
+
+    const { chartData, legendData } = processData();
+
+    const renderCustomLegend = () => (
+        <div className={styles.customLegend}>
+            {Object.entries(LEVEL_LABELS).map(([category, label]) => {
+                const categoryItems = legendData.filter(item => item.category === category);
+                if (categoryItems.length === 0) return null;
+
+                return (
+                    <div key={category} className={styles.legendCategory}>
+                        <div className={styles.categoryHeader}>
+                            <span 
+                                className={styles.categoryDot}
+                                style={{ backgroundColor: COLORS[category] }}
+                            />
+                            <span className={styles.categoryLabel}>{label}</span>
+                        </div>
+                        <div className={styles.categoryItems}>
+                            {categoryItems.map(item => (
+                                <div key={item.level} className={styles.legendItem}>
+                                    <span className={styles.levelLabel}>Nivel {item.level}:</span>
+                                    <span className={styles.levelValue}>
+                                        {item.value}
+                                        <span className={styles.levelPercentage}>
+                                            ({item.percentage}%)
+                                        </span>
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })}
         </div>
     );
 
@@ -107,13 +134,12 @@ const RuleLevelsPieChart = ({ data, showOnlyLegends = false, showOnlyGraphic = f
                                 return (
                                     <div className={styles.tooltip}>
                                         <p className={styles.tooltipLabel}>
-                                            {name === 'bajo' ? 'Nivel Bajo' : 
-                                             name === 'medio' ? 'Nivel Medio' : 
-                                             'Nivel Alto'}
+                                            {LEVEL_LABELS[name]}
                                         </p>
                                         <p className={styles.tooltipValue}>
                                             <span className={styles.tooltipCount}>{value}</span>
                                             <span className={styles.tooltipUnit}> alertas</span>
+                                            <span className={styles.tooltipPercentage}> ({percentage}%)</span>
                                         </p>
                                     </div>
                                 );
@@ -128,10 +154,10 @@ const RuleLevelsPieChart = ({ data, showOnlyLegends = false, showOnlyGraphic = f
 
     return (
         <div className={styles.container}>
-            {!showOnlyGraphic && <h3 className={styles.title}>Distribución por Nivel</h3>}
+            {!showOnlyGraphic && <h3 className={styles.title}>Distribución por Nivel de Riesgo</h3>}
             <div className={styles.content}>
-                {!showOnlyGraphic && renderLegends()}
                 {!showOnlyLegends && renderGraphic()}
+                {!showOnlyGraphic && renderCustomLegend()}
             </div>
         </div>
     );

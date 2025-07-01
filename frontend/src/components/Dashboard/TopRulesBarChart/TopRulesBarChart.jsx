@@ -39,10 +39,8 @@ const TopRulesBarChart = ({ data, showOnlyLegends = false, showOnlyGraphic = fal
         );
     }
 
-    // Calcular el total para los porcentajes
     const total = data.reduce((sum, item) => sum + item.count, 0);
 
-    // Preparar los datos con porcentajes e índices
     const statsData = data.map((item, index) => ({
         ...item,
         index: index + 1,
@@ -126,7 +124,7 @@ const TopRulesBarChart = ({ data, showOnlyLegends = false, showOnlyGraphic = fal
 
     return (
         <div className={styles.container}>
-            {showTitle && <h3 className={styles.title}>Reglas más Frecuentes</h3>}
+            {showTitle && <h3 className={styles.title}>Reglas más frecuentes</h3>}
             <div className={styles.content}>
                 {!showOnlyGraphic && !showOnlyLegends && renderStats()}
                 {!showOnlyLegends && renderGraphic()}
