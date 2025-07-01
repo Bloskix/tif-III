@@ -6,7 +6,7 @@ import * as yup from 'yup';
 
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../hooks/useAuth';
 import styles from './RegisterPage.module.css';
 
 const schema = yup.object().shape({

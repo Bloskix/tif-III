@@ -14,7 +14,7 @@ const Button = ({
             ${fullWidth ? styles.fullWidth : ''}
             ${loading ? styles.loading : ''}
         `}
-        disabled={loading}
+        disabled={loading || props.disabled}
         {...props}
     >
         {loading ? (
