@@ -1,52 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './Dashboard.module.css';
 import DashboardPeriodSelector from './DashboardPeriodSelector/DashboardPeriodSelector';
 import AlertsOverTimeChart from './AlertsOverTimeChart/AlertsOverTimeChart';
 import RuleLevelsPieChart from './RuleLevelsPieChart/RuleLevelsPieChart';
 import TopRulesBarChart from './TopRulesBarChart/TopRulesBarChart';
-import { alertService } from '../../services/alertService';
-
-const REFRESH_INTERVAL = 60000; // 1 minuto en milisegundos
+import { useDashboardData } from '../../hooks/useDashboardData';
 
 const Dashboard = () => {
   const [period, setPeriod] = useState('weekly');
-  const [dashboardData, setDashboardData] = useState({
-    alertsOverTime: [],
-    ruleLevels: [],
-    topRules: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const data = await alertService.getDashboardStats(period);
-      setDashboardData(data);
-    } catch (err) {
-      setError(err.message);
-      setDashboardData({
-        alertsOverTime: [],
-        ruleLevels: [],
-        topRules: []
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Cargar datos inicialmente
-    fetchDashboardData();
-
-    // Configurar intervalo de actualización
-    const intervalId = setInterval(fetchDashboardData, REFRESH_INTERVAL);
-
-    // Limpiar intervalo al desmontar
-    return () => clearInterval(intervalId);
-  }, [period]); // Se recrea el intervalo cuando cambia el período
+  const { dashboardData, loading, error } = useDashboardData(period);
 
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);

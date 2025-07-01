@@ -269,31 +269,19 @@ class AlertService:
 
     async def get_monthly_alert_stats(self) -> Dict[str, Any]:
         """
-        Obtiene estadísticas básicas de las alertas del mes actual hasta hoy.
+        Obtiene estadísticas de las alertas de los últimos 30 días.
         """
         try:
-            # Configurar rango de fechas para el mes actual
+            # Configurar rango de fechas para los últimos 30 días
             now = datetime.now()
-            first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            
-            # Usar un patrón de índice más flexible para el mes actual
-            current_month = now.strftime('%Y.%m')
-            index_pattern = f"wazuh-alerts-{current_month}.*"
-            
-            # Verificar si existen índices para el patrón
-            indices_exist = self.client.indices.exists(index=index_pattern)
-            if not indices_exist:
-                return {
-                    "message": "No existen alertas para el mes actual.",
-                    "error": "index_not_found_exception"
-                }
+            start_date = now - timedelta(days=30)
             
             query = {
                 "size": 0,
                 "query": {
                     "range": {
                         "@timestamp": {
-                            "gte": first_day.isoformat(),
+                            "gte": start_date.isoformat(),
                             "lte": now.isoformat()
                         }
                     }
@@ -314,11 +302,11 @@ class AlertService:
                     "alerts_over_time": {
                         "date_histogram": {
                             "field": "@timestamp",
-                            "calendar_interval": "day",
+                            "fixed_interval": "1d",
                             "format": "yyyy-MM-dd",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": first_day.strftime("%Y-%m-%d"),
+                                "min": start_date.strftime("%Y-%m-%d"),
                                 "max": now.strftime("%Y-%m-%d")
                             }
                         }
@@ -327,7 +315,7 @@ class AlertService:
             }
 
             response = self.client.search(
-                index=index_pattern,
+                index="wazuh-alerts-*",
                 body=query
             )
 
@@ -335,7 +323,7 @@ class AlertService:
             total_hits = response["hits"]["total"]["value"]
             if total_hits == 0:
                 return {
-                    "message": "No existen alertas para el mes actual.",
+                    "message": "No existen alertas para los últimos 30 días.",
                     "error": "no_alerts_found"
                 }
 
