@@ -4,8 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import Input from '../../components/Input/Input';
-import Button from '../../components/Button/Button';
+import AuthForm from '../../components/AuthForm/AuthForm';
 import useAuth from '../../hooks/useAuth';
 import styles from './RegisterPage.module.css';
 
@@ -27,6 +26,29 @@ const schema = yup.object().shape({
         .oneOf([yup.ref('password'), null], 'Las contraseñas deben coincidir')
         .required('Confirmar contraseña es requerido'),
 });
+
+const registerFields = [
+    {
+        name: 'email',
+        label: 'Email',
+        type: 'email'
+    },
+    {
+        name: 'username',
+        label: 'Nombre de usuario',
+        type: 'text'
+    },
+    {
+        name: 'password',
+        label: 'Contraseña',
+        type: 'password'
+    },
+    {
+        name: 'confirmPassword',
+        label: 'Confirmar contraseña',
+        type: 'password'
+    }
+];
 
 const RegisterPage = () => {
     const [error, setError] = useState('');
@@ -64,59 +86,21 @@ const RegisterPage = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.formContainer}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Crear una cuenta</h1>
+            <AuthForm
+                fields={registerFields}
+                onSubmit={onSubmit}
+                errors={errors}
+                loading={loading}
+                error={error}
+                handleSubmit={handleSubmit}
+                register={register}
+                buttonText="Registrarse"
+            >
+                <div className={styles.loginLink}>
+                    ¿Ya tienes una cuenta?
+                    <Link to="/login">Inicia sesión</Link>
                 </div>
-
-                <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-                    {error && (
-                        <div className={styles.error}>
-                            {error}
-                        </div>
-                    )}
-
-                    <Input
-                        label="Email"
-                        type="email"
-                        {...register('email')}
-                        error={errors.email}
-                    />
-
-                    <Input
-                        label="Nombre de usuario"
-                        {...register('username')}
-                        error={errors.username}
-                    />
-
-                    <Input
-                        label="Contraseña"
-                        type="password"
-                        {...register('password')}
-                        error={errors.password}
-                    />
-
-                    <Input
-                        label="Confirmar contraseña"
-                        type="password"
-                        {...register('confirmPassword')}
-                        error={errors.confirmPassword}
-                    />
-
-                    <Button
-                        type="submit"
-                        fullWidth
-                        loading={loading}
-                    >
-                        Registrarse
-                    </Button>
-
-                    <div className={styles.loginLink}>
-                        ¿Ya tienes una cuenta?
-                        <Link to="/login">Inicia sesión</Link>
-                    </div>
-                </form>
-            </div>
+            </AuthForm>
         </div>
     );
 };

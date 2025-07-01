@@ -4,8 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import Input from '../../components/Input/Input';
-import Button from '../../components/Button/Button';
+import AuthForm from '../../components/AuthForm/AuthForm';
 import useAuth from '../../hooks/useAuth';
 import styles from './LoginPage.module.css';
 
@@ -19,6 +18,19 @@ const schema = yup.object().shape({
         .required('La contraseña es requerida')
         .min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
+
+const loginFields = [
+    {
+        name: 'email',
+        label: 'Email',
+        type: 'email'
+    },
+    {
+        name: 'password',
+        label: 'Contraseña',
+        type: 'password'
+    }
+];
 
 const LoginPage = () => {
     const [error, setError] = useState('');
@@ -53,46 +65,21 @@ const LoginPage = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.formContainer}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Iniciar Sesión</h1>
+            <AuthForm
+                fields={loginFields}
+                onSubmit={onSubmit}
+                errors={errors}
+                loading={loading}
+                error={error}
+                handleSubmit={handleSubmit}
+                register={register}
+                buttonText="Iniciar Sesión"
+            >
+                <div className={styles.signupLink}>
+                    ¿No tienes una cuenta?
+                    <Link to="/register">Regístrate</Link>
                 </div>
-
-                <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-                    {error && (
-                        <div className={styles.error}>
-                            {error}
-                        </div>
-                    )}
-
-                    <Input
-                        label="Email"
-                        type="email"
-                        {...register('email')}
-                        error={errors.email}
-                    />
-
-                    <Input
-                        label="Contraseña"
-                        type="password"
-                        {...register('password')}
-                        error={errors.password}
-                    />
-
-                    <Button
-                        type="submit"
-                        fullWidth
-                        loading={loading}
-                    >
-                        Iniciar Sesión
-                    </Button>
-
-                    <div className={styles.signupLink}>
-                        ¿No tienes una cuenta?
-                        <Link to="/register">Regístrate</Link>
-                    </div>
-                </form>
-            </div>
+            </AuthForm>
         </div>
     );
 };

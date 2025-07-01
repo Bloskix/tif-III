@@ -3,8 +3,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
     background-color: #f3f4f6;
-    padding: 1.5rem;
 }
 
 .formContainer {
@@ -41,23 +41,18 @@
 }
 
 .signupLink {
-    margin-top: 1.5rem;
     text-align: center;
-    font-size: 0.875rem;
-    color: #4b5563;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    margin-top: 1rem;
 }
 
 .signupLink a {
-    color: #3b82f6;
+    margin-left: 0.5rem;
+    color: #2563eb;
     text-decoration: none;
-    margin-left: 0.25rem;
-    font-weight: 500;
 }
 
 .signupLink a:hover {
-    color: #2563eb;
+    text-decoration: underline;
 }
 
 .error {
