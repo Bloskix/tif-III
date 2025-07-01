@@ -11,7 +11,6 @@ import MePage from './pages/me/MePage';
 import publicStyles from './layouts/PublicLayout.module.css';
 import './App.css';
 
-// Layout para rutas públicas
 const PublicLayout = () => {
   const { isAuthenticated } = useAuth();
   
@@ -26,7 +25,6 @@ const PublicLayout = () => {
   );
 };
 
-// Layout para rutas privadas
 const PrivateLayout = () => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -45,7 +43,6 @@ const PrivateLayout = () => {
   return <Outlet />;
 };
 
-// Layout para rutas de admin
 const AdminLayout = () => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
@@ -73,24 +70,19 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Rutas Públicas */}
           <Route element={<PublicLayout />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
-          {/* Rutas de Admin */}
           <Route element={<AdminLayout />}>
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
 
-          {/* Rutas Privadas */}
           <Route element={<PrivateLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/alerts" element={<HomePage />} />
             <Route path="/review" element={<ReviewPage />} />
             <Route path="/me" element={<MePage />} />
-            {/* Redirigir cualquier otra ruta a Home */}
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
         </Routes>

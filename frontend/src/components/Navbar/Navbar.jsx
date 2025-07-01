@@ -2,11 +2,10 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     HomeIcon,
-    BellAlertIcon,
     ClipboardDocumentCheckIcon,
     Cog6ToothIcon,
     UserCircleIcon,
-    ArrowRightOnRectangleIcon
+    ArrowRightStartOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import useAuth from '../../hooks/useAuth';
 import styles from './Navbar.module.css';
@@ -34,14 +33,6 @@ const Navbar = () => {
             >
                 <HomeIcon className={styles.icon} />
                 <span>Inicio</span>
-            </Link>
-    
-            <Link 
-                to="/alerts" 
-                className={`${styles.navItem} ${isActive('/alerts') ? styles.active : ''}`}
-            >
-                <BellAlertIcon className={styles.icon} />
-                <span>Alertas</span>
             </Link>
     
             <Link 
@@ -76,7 +67,7 @@ const Navbar = () => {
                 className={`${styles.navItem} ${styles.logoutButton}`}
                 onClick={handleLogout}
             >
-                <ArrowRightOnRectangleIcon className={styles.icon} />
+                <ArrowRightStartOnRectangleIcon className={styles.icon} />
                 <span>Salir</span>
             </button>
             </div>
