@@ -38,11 +38,6 @@
     font-size: 1.5rem;
 }
 
-.markForReviewButton {
-    background-color: #4CAF50;
-    color: white;
-}
-
 .closeButton {
     background: none;
     border: none;
@@ -102,36 +97,25 @@
     justify-content: flex-end;
 }
 
-.closeAlertButton {
-    background-color: #f44336;
-    color: white;
-}
-
-.error {
-    color: #f44336;
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #ffebee;
-    border-radius: 4px;
-}
-
 .statusBadge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.9em;
+    margin-left: 60px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .abierta {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #dcfce7;
+    color: #16a34a;
 }
 
 .cerrada {
-    background-color: #f44336;
-    color: white;
+    background-color: #fee2e2;
+    color: #dc2626;
 }
 
 .ignored {
-    background-color: #9e9e9e;
-    color: white;
+    background-color: #f5f5f5;
+    color: #666666;
 } 

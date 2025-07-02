@@ -19,33 +19,17 @@ const AlertsTab = () => {
   const PAGE_SIZE = 10;
 
   useEffect(() => {
-    console.log('useEffect ejecutado - Cambios en:', {
-      currentPage,
-      activeFilters
-    });
     loadAlerts();
   }, [currentPage, activeFilters]);
 
   const loadAlerts = async () => {
     try {
       setLoading(true);
-      console.log('Realizando petición con parámetros:', {
-        page: currentPage,
-        size: PAGE_SIZE,
-        ...activeFilters
-      });
 
       const response = await alertService.getAlerts({
         page: currentPage,
         size: PAGE_SIZE,
         ...activeFilters
-      });
-
-      console.log('Respuesta del servidor:', {
-        total: response.total,
-        alertCount: response.alerts.length,
-        firstAlert: response.alerts[0],
-        params: response.params // por si el backend devuelve los parámetros usados
       });
 
       setAlerts(response.alerts);
@@ -70,8 +54,7 @@ const AlertsTab = () => {
   };
 
   const handleApplyFilters = (filters) => {
-    console.log('Aplicando nuevos filtros:', filters);
-    setCurrentPage(1); // Resetear a la primera página
+    setCurrentPage(1);
     setActiveFilters(filters);
   };
 

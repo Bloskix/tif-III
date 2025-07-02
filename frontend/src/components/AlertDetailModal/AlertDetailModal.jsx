@@ -1,69 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './AlertDetailModal.module.css';
 import Button from '../Button/Button';
-import { reviewService } from '../../services/reviewService';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import { useAlertActions } from '../../hooks/useAlertActions';
+import { normalizeAlert, ALERT_STATES } from '../../utils/alertUtils';
 
 const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const { isLoading, error, markForReview, closeAlert } = useAlertActions(onAlertStateChange, onClose);
 
     if (!alert) return null;
 
-    // Normalizar la estructura de la alerta para manejar tanto alertas normales como gestionadas
-    const normalizedAlert = {
-        id: alert.id,
-        timestamp: alert.timestamp,
-        status: alert.state || alert.status,
-        agent: {
-            id: alert.agent_id || (alert.agent && alert.agent.id),
-            name: alert.agent_name || (alert.agent && alert.agent.name),
-            ip: alert.agent_ip || (alert.agent && alert.agent.ip)
-        },
-        rule: {
-            id: alert.rule_id || (alert.rule && alert.rule.id),
-            level: alert.rule_level || (alert.rule && alert.rule.level),
-            description: alert.rule_description || (alert.rule && alert.rule.description),
-            groups: (alert.rule && alert.rule.groups) || []
-        },
-        full_log: alert.alert_data || alert.full_log,
-        location: alert.location
-    };
+    const normalizedAlert = normalizeAlert(alert);
 
-    const handleMarkForReview = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            await reviewService.markAlertForReview(normalizedAlert.id, {
-                id: normalizedAlert.id,
-                timestamp: normalizedAlert.timestamp,
-                agent: normalizedAlert.agent,
-                rule: normalizedAlert.rule,
-                full_log: normalizedAlert.full_log,
-                location: normalizedAlert.location
-            });
-            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'abierta');
-            onClose();
-        } catch (err) {
-            setError('Error al marcar la alerta para revisión');
-            console.error('Error:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const renderStatusBadge = (status) => {
+        const statusText = {
+            [ALERT_STATES.OPEN]: 'Abierta',
+            [ALERT_STATES.CLOSED]: 'Cerrada'
+        }[status] || 'Ignorada';
 
-    const handleCloseAlert = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            await reviewService.updateAlertState(normalizedAlert.id, 'cerrada');
-            onAlertStateChange && onAlertStateChange(normalizedAlert.id, 'cerrada');
-            onClose();
-        } catch (err) {
-            setError('Error al cerrar la alerta');
-            console.error('Error:', err);
-        } finally {
-            setIsLoading(false);
-        }
+        return (
+            <span className={`${styles.statusBadge} ${styles[status || ALERT_STATES.IGNORED]}`}>
+                {statusText}
+            </span>
+        );
     };
 
     return (
@@ -90,12 +49,9 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) =
                             <span>{normalizedAlert.id}</span>
                         </div>
                         {isReviewTab && (
-                            <div className={styles.detailRow}>
+                            <div>
                                 <span className={styles.label}>Estado:</span>
-                                <span className={`${styles.statusBadge} ${styles[normalizedAlert.status || 'ignored']}`}>
-                                    {normalizedAlert.status === 'abierta' ? 'Abierta' : 
-                                     normalizedAlert.status === 'cerrada' ? 'Cerrada' : 'Ignorada'}
-                                </span>
+                                {renderStatusBadge(normalizedAlert.status)}
                             </div>
                         )}
                     </div>
@@ -137,28 +93,24 @@ const AlertDetailModal = ({ alert, onClose, onAlertStateChange, isReviewTab }) =
                         </pre>
                     </div>
 
-                    {error && (
-                        <div className={styles.error}>
-                            {error}
-                        </div>
-                    )}
+                    <ErrorMessage message={error} />
                 </div>
 
                 <div className={styles.modalFooter}>
                     {!normalizedAlert.status && (
                         <Button
-                            onClick={handleMarkForReview}
+                            onClick={() => markForReview(alert)}
                             disabled={isLoading}
-                            className={styles.markForReviewButton}
+                            variant="success"
                         >
                             Marcar para revisión
                         </Button>
                     )}
-                    {isReviewTab && normalizedAlert.status === 'abierta' && (
+                    {isReviewTab && normalizedAlert.status === ALERT_STATES.OPEN && (
                         <Button
-                            onClick={handleCloseAlert}
+                            onClick={() => closeAlert(normalizedAlert.id)}
                             disabled={isLoading}
-                            className={styles.closeAlertButton}
+                            variant="danger"
                         >
                             Cerrar Alerta
                         </Button>
