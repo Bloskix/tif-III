@@ -1,54 +1,71 @@
 .inputContainer {
-    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     width: 100%;
 }
 
+.label {
+    font-size: 0.875rem;    
+    font-weight: 500;
+    color: #666;
+}
+
 .input {
+    color: #101419;
+    padding: 0.5rem;
+    border: 1px solid #c1c1c1;
+    border-radius: 4px;
+    font-size: 1rem;
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: white;
+    transition: all 0.2s ease;
 }
 
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus {
     -webkit-text-fill-color: #1a1a1a;
-    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
     transition: background-color 5000s ease-in-out 0s;
-}
-
-.input::placeholder {
-    color: #94a3b8;
-}
-
-.input:hover {
-    border-color: #cbd5e1;
 }
 
 .input:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    border-color: #2196f3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.input::placeholder {
+    color: #999;
 }
 
 .error {
-    border-color: #ef4444;
+    border-color: #f44336;
 }
 
 .error:focus {
-    border-color: #ef4444;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+    border-color: #f44336;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.1);
 }
 
 .errorMessage {
-    display: block;
-    margin-top: 0.5rem;
-    color: #ef4444;
+    color: #f44336;
     font-size: 0.75rem;
-    font-weight: 500;
+    margin-top: -0.25rem;
+}
+
+/* Estilos para select */
+select.input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+}
+
+/* Estilos para input readonly (DatePicker) */
+.input[readonly] {
+    background-color: white;
+    cursor: pointer;
 } 

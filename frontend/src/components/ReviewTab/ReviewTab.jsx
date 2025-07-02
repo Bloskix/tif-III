@@ -6,6 +6,7 @@ import { es } from 'date-fns/locale';
 import AlertsFilters from '../AlertsFilters/AlertsFilters';
 import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
 import AlertNoteModal from '../AlertNoteModal/AlertNoteModal';
+import Button from '../Button/Button';
 
 const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   const [alerts, setAlerts] = useState([]);
@@ -151,12 +152,12 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button 
+        <Button 
           onClick={() => setShowFilters(!showFilters)}
-          className={styles.toggleFiltersButton}
+          variant="secondary"
         >
           {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-        </button>
+        </Button>
       </div>
 
       {showFilters && (

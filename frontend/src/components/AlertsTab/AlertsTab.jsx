@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import AlertsFilters from '../AlertsFilters/AlertsFilters';
 import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
+import Button from '../Button/Button';
 
 const AlertsTab = () => {
   const [alerts, setAlerts] = useState([]);
@@ -127,12 +128,12 @@ const AlertsTab = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button 
+        <Button 
           onClick={() => setShowFilters(!showFilters)}
-          className={styles.toggleFiltersButton}
+          variant="secondary"
         >
           {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-        </button>
+        </Button>
       </div>
 
       {showFilters && (

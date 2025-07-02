@@ -54,53 +54,53 @@
 }
 
 .primary {
-    border-color: black;
-    color: black;
+    border-color: #101419;
+    color: #101419;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
 .primary:hover:not(:disabled) {
-    background-color: black;
+    background-color: #101419;
     color: white;
-    border-color: black;
+    border-color: #101419;
     box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
 }
 
 .secondary {
-    border-color: #2563eb;
-    color: #2563eb;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    border-color: #98a09e;
+    color: #98a09e;
+    box-shadow: 0 4px 6px -1px rgba(152, 160, 158, 0.2);
 }
 
 .secondary:hover:not(:disabled) {
-    background-color: #2563eb;
-    border-color: #2563eb;
+    background-color: #98a09e;
+    border-color: #98a09e;
     color: white;
-    box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 6px 8px -1px rgba(152, 160, 158, 0.3);
 }
 
 .danger {
-    border-color: #dc2626;
-    color: #dc2626;
+    border-color: #984447;
+    color: #984447;
     box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
 }
 
 .danger:hover:not(:disabled) {
-    background-color: #dc2626;
-    border-color: #dc2626;
+    background-color: #984447;
+    border-color: #984447;
     color: white;
     box-shadow: 0 6px 8px -1px rgba(220, 38, 38, 0.3);
 }
 
 .success {
-    border-color: #16a34a;
-    color: #16a34a;
-    box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.2);
+    border-color: #345aad;
+    color: #345aad;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
 .success:hover:not(:disabled) {
-    background-color: #16a34a;
-    border-color: #16a34a;
+    background-color: #345aad;
+    border-color: #345aad;
     color: white;
-    box-shadow: 0 6px 8px -1px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
 } 

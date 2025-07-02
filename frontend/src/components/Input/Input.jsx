@@ -1,26 +1,41 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import styles from './Input.module.css';
 
 const Input = forwardRef(({ 
     label, 
-    error, 
+    error,
+    as = 'input',
     type = 'text',
+    children,
+    className,
     ...props 
-}, ref) => (
-    <div className={styles.inputContainer}>
-        <input
-            ref={ref}
-            type={type}
-            className={`${styles.input} ${error ? styles.error : ''}`}
-            placeholder={label}
-            {...props}
-        />
-        {error && (
-            <span className={styles.errorMessage}>
-                {error.message}
-            </span>
-        )}
-    </div>
-));
+}, ref) => {
+    const Component = as;
+    
+    return (
+        <div className={styles.inputContainer}>
+            {label && (
+                <label className={styles.label}>
+                    {label}
+                </label>
+            )}
+            <Component
+                ref={ref}
+                type={as === 'input' ? type : undefined}
+                className={`${styles.input} ${error ? styles.error : ''} ${className || ''}`}
+                {...props}
+            >
+                {children}
+            </Component>
+            {error && (
+                <span className={styles.errorMessage}>
+                    {error.message}
+                </span>
+            )}
+        </div>
+    );
+});
+
+Input.displayName = 'Input';
 
 export default Input; 
