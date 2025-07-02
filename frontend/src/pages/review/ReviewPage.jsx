@@ -3,16 +3,15 @@ import styles from './ReviewPage.module.css';
 import ReviewTab from '../../components/ReviewTab/ReviewTab';
 import Navbar from '../../components/Navbar/Navbar';
 import SidebarMenu from '../../components/SidebarMenu/SidebarMenu';
-import { useReviewTabs } from '../../hooks/useReviewTabs';
+import { useTabs } from '../../hooks/useTabs';
+
+const REVIEW_TABS = [
+    { id: 'abiertas', label: 'Alertas en Revisión' },
+    { id: 'cerradas', label: 'Alertas Cerradas' },
+];
 
 const ReviewPage = () => {
-    const {
-        activeTab,
-        setActiveTab,
-        getCurrentTabState,
-        shouldShowNotes,
-        tabs
-    } = useReviewTabs();
+    const { activeTab, setActiveTab, isTab, tabs } = useTabs(REVIEW_TABS, 'abiertas');
 
     return (
         <div className={styles.root}>
@@ -26,8 +25,8 @@ const ReviewPage = () => {
                     />
                     <div className={styles.mainPanel}>
                         <ReviewTab 
-                            state={getCurrentTabState()} 
-                            showNotes={shouldShowNotes}
+                            state={isTab('abiertas') ? 'abierta' : 'cerrada'} 
+                            showNotes={isTab('abiertas')}
                         />
                     </div>
                 </div>
