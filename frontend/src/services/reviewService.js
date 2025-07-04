@@ -57,6 +57,10 @@ class ReviewService {
      */
     async updateManagedAlertState(alertId, state) {
         try {
+            if (state !== 'abierta' && state !== 'cerrada') {
+                throw new Error('Estado no válido. Debe ser "abierta" o "cerrada"');
+            }
+
             const response = await api.put(`/review/${alertId}`, {
                 state: state
             });

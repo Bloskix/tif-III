@@ -3,7 +3,6 @@ import styles from './ReviewTab.module.css';
 import { reviewService } from '../../services/reviewService';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import AlertsFilters from '../AlertsFilters/AlertsFilters';
 import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
 import AlertNoteModal from '../AlertNoteModal/AlertNoteModal';
 import Button from '../Button/Button';
@@ -14,8 +13,6 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalAlerts, setTotalAlerts] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilters, setActiveFilters] = useState({});
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [selectedAlertForNotes, setSelectedAlertForNotes] = useState(null);
   const [alertNotes, setAlertNotes] = useState([]);
@@ -25,7 +22,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
 
   useEffect(() => {
     loadAlerts();
-  }, [currentPage, activeFilters]);
+  }, [currentPage, state]);
 
   const loadAlerts = async () => {
     try {
@@ -33,8 +30,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       const response = await reviewService.getManagedAlerts({
         page: currentPage,
         size: PAGE_SIZE,
-        state: state,
-        ...activeFilters
+        state: state
       });
 
       setAlerts(response.alerts);
@@ -55,11 +51,6 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
     } catch (error) {
       return 'Fecha inválida';
     }
-  };
-
-  const handleApplyFilters = (filters) => {
-    setCurrentPage(1);
-    setActiveFilters(filters);
   };
 
   const totalPages = Math.ceil(totalAlerts / PAGE_SIZE);
@@ -96,7 +87,6 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   const handleAlertStateChange = async (alertId, newState) => {
     try {
       await reviewService.updateManagedAlertState(alertId, newState);
-      // Recargar la lista de alertas
       loadAlerts();
     } catch (err) {
       console.error('Error al actualizar el estado de la alerta:', err);
@@ -151,19 +141,6 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <Button 
-          onClick={() => setShowFilters(!showFilters)}
-          variant="secondary"
-        >
-          {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-        </Button>
-      </div>
-
-      {showFilters && (
-        <AlertsFilters onApplyFilters={handleApplyFilters} />
-      )}
-      
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>

@@ -6,12 +6,12 @@ import SidebarMenu from '../../components/SidebarMenu/SidebarMenu';
 import { useTabs } from '../../hooks/useTabs';
 
 const REVIEW_TABS = [
-    { id: 'abiertas', label: 'Alertas en Revisión' },
+    { id: 'abiertas', label: 'Alertas Abiertas' },
     { id: 'cerradas', label: 'Alertas Cerradas' },
 ];
 
 const ReviewPage = () => {
-    const { activeTab, setActiveTab, isTab, tabs } = useTabs(REVIEW_TABS, 'abiertas');
+    const { activeTab, setActiveTab, tabs } = useTabs(REVIEW_TABS, 'abiertas');
 
     return (
         <div className={styles.root}>
@@ -20,13 +20,15 @@ const ReviewPage = () => {
                 <div className={styles.content}>
                     <SidebarMenu 
                         activeTab={activeTab}
-                        onTabChange={setActiveTab}
+                        onTabChange={(tab) => {
+                            setActiveTab(tab);
+                        }}
                         options={tabs}
                     />
                     <div className={styles.mainPanel}>
                         <ReviewTab 
-                            state={isTab('abiertas') ? 'abierta' : 'cerrada'} 
-                            showNotes={isTab('abiertas')}
+                            state={activeTab === 'abiertas' ? 'abierta' : 'cerrada'} 
+                            showNotes={activeTab === 'abiertas'}
                         />
                     </div>
                 </div>
