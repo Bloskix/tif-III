@@ -7,8 +7,8 @@ from app.core.config import settings, BASE_DIR
 from app.api import auth, users, alerts, review, notifications
 from app.scripts.create_initial_admin import create_initial_admin
 from app.opensearch.client import opensearch_client
+from app.services.alert_scheduler import alert_scheduler
 
-# Cargar variables de entorno al inicio
 load_dotenv(BASE_DIR / ".env")
 
 app = FastAPI(
@@ -68,6 +68,8 @@ app.include_router(
 # Crear admin inicial si no existe
 create_initial_admin()
 
+# Iniciar el scheduler de alertas
+alert_scheduler.start(app)
 
 @app.get("/")
 async def root():

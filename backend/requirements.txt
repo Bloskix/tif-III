@@ -13,4 +13,5 @@ alembic[tz]==1.13.1
 opensearch-py==2.4.2
 aiosmtplib==3.0.1
 pytest==8.0.0
-httpx==0.26.0 
+httpx==0.26.0
+APScheduler==3.10.4 
