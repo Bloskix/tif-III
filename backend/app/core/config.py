@@ -12,7 +12,7 @@ load_dotenv(BASE_DIR / ".env")
 
 class Settings(BaseSettings):
     ENV: str = "development"
-    PROJECT_NAME: str = "Sistema de Monitoreo de Seguridad"
+    PROJECT_NAME: str = "PymesCBS"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
