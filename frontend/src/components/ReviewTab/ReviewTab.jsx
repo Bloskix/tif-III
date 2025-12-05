@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import styles from './ReviewTab.module.css';
-import { reviewService } from '../../services/reviewService';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
-import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
-import AlertNoteModal from '../AlertNoteModal/AlertNoteModal';
-import Button from '../Button/Button';
+import React, { useState, useEffect } from "react";
+import styles from "./ReviewTab.module.css";
+import { reviewService } from "../../services/reviewService";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import AlertDetailModal from "../AlertDetailModal/AlertDetailModal";
+import AlertNoteModal from "../AlertNoteModal/AlertNoteModal";
+import Button from "../Button/Button";
 
-const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
+const ReviewTab = ({ state = "abierta", showNotes = true }) => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,15 +30,15 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       const response = await reviewService.getManagedAlerts({
         page: currentPage,
         size: PAGE_SIZE,
-        state: state
+        state: state,
       });
 
       setAlerts(response.alerts);
       setTotalAlerts(response.total);
       setError(null);
     } catch (err) {
-      console.error('Error en loadAlerts:', err);
-      setError('Error al cargar las alertas: ' + err.message);
+      console.error("Error en loadAlerts:", err);
+      setError("Error al cargar las alertas: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -47,9 +47,9 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   const formatDate = (dateString) => {
     try {
       const date = parseISO(dateString);
-      return format(date, 'dd/MM/yyyy HH:mm:ss', { locale: es });
+      return format(date, "dd/MM/yyyy HH:mm:ss", { locale: es });
     } catch (error) {
-      return 'Fecha inválida';
+      return "Fecha inválida";
     }
   };
 
@@ -57,13 +57,13 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev) => prev - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -73,8 +73,8 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       const alertDetails = await reviewService.getManagedAlertDetails(alertId);
       setSelectedAlert(alertDetails);
     } catch (err) {
-      console.error('Error al cargar los detalles de la alerta:', err);
-      setError('Error al cargar los detalles de la alerta: ' + err.message);
+      console.error("Error al cargar los detalles de la alerta:", err);
+      setError("Error al cargar los detalles de la alerta: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -89,8 +89,8 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       await reviewService.updateManagedAlertState(alertId, newState);
       loadAlerts();
     } catch (err) {
-      console.error('Error al actualizar el estado de la alerta:', err);
-      setError('Error al actualizar el estado de la alerta: ' + err.message);
+      console.error("Error al actualizar el estado de la alerta:", err);
+      setError("Error al actualizar el estado de la alerta: " + err.message);
     }
   };
 
@@ -114,7 +114,11 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   };
 
   const handleDeleteAlert = async (alertId) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar esta alerta? Esta acción eliminará también todas las notas asociadas.')) {
+    if (
+      !window.confirm(
+        "¿Estás seguro de que deseas eliminar esta alerta? Esta acción eliminará también todas las notas asociadas."
+      )
+    ) {
       return;
     }
 
@@ -124,15 +128,17 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       loadAlerts(); // Recargar la lista después de eliminar
       setError(null);
     } catch (err) {
-      console.error('Error al eliminar la alerta:', err);
-      setError('Error al eliminar la alerta: ' + err.message);
+      console.error("Error al eliminar la alerta:", err);
+      setError("Error al eliminar la alerta: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className={styles.loading}>Cargando alertas en revisión...</div>;
+    return (
+      <div className={styles.loading}>Cargando alertas en revisión...</div>
+    );
   }
 
   if (error) {
@@ -154,7 +160,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
             </tr>
           </thead>
           <tbody>
-            {alerts.map(alert => (
+            {alerts.map((alert) => (
               <tr key={alert.id}>
                 <td>{formatDate(alert.timestamp)}</td>
                 <td>{alert.agent_name}</td>
@@ -163,7 +169,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
                 <td>{alert.rule_level}</td>
                 <td>
                   <div className={styles.actionButtons}>
-                    <button 
+                    <button
                       className={styles.viewButton}
                       onClick={() => handleViewAlert(alert.id)}
                       title="Ver detalles"
@@ -171,7 +177,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
                       <i className="fas fa-eye"></i>
                     </button>
                     {showNotes && (
-                      <button 
+                      <button
                         className={styles.notesButton}
                         onClick={() => handleNotesClick(alert.id)}
                         title="Ver/agregar notas"
@@ -179,7 +185,7 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
                         <i className="fas fa-sticky-note"></i>
                       </button>
                     )}
-                    <button 
+                    <button
                       className={styles.deleteButton}
                       onClick={() => handleDeleteAlert(alert.id)}
                       title="Eliminar alerta"
@@ -195,8 +201,8 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
       </div>
 
       <div className={styles.pagination}>
-        <button 
-          onClick={handlePreviousPage} 
+        <button
+          onClick={handlePreviousPage}
           disabled={currentPage === 1}
           className={styles.paginationButton}
         >
@@ -205,8 +211,8 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
         <span className={styles.pageInfo}>
           Página {currentPage} de {totalPages}
         </span>
-        <button 
-          onClick={handleNextPage} 
+        <button
+          onClick={handleNextPage}
           disabled={currentPage === totalPages}
           className={styles.paginationButton}
         >
@@ -241,4 +247,4 @@ const ReviewTab = ({ state = 'abierta', showNotes = true }) => {
   );
 };
 
-export default ReviewTab; 
+export default ReviewTab;

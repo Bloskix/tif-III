@@ -1,80 +1,81 @@
 .container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background-color: #f3f4f6;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #f3f4f6;
 }
 
 .formContainer {
-    width: 100%;
-    max-width: 400px;
-    background-color: #ffffff;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
 }
 
 .header {
-    margin-bottom: 2rem;
-    text-align: left;
+  margin-bottom: 2rem;
+  text-align: left;
 }
 
 .title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.025em;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
 }
 
 .subtitle {
-    font-size: 0.875rem;
-    color: #64748b;
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
 .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .signupLink {
-    text-align: center;
-    margin-top: 1rem;
+  text-align: center;
+  margin-top: 1rem;
 }
 
 .signupLink a {
-    margin-left: 0.5rem;
-    color: #2563eb;
-    text-decoration: none;
+  margin-left: 0.5rem;
+  color: #2563eb;
+  text-decoration: none;
 }
 
 .signupLink a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .error {
-    background-color: #fef2f2;
-    border: 1px solid #fee2e2;
-    border-radius: 0.75rem;
-    padding: 1rem;
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 @media (max-width: 640px) {
-    .container {
-        padding: 1rem;
-        background-color: #ffffff;
-    }
+  .container {
+    padding: 1rem;
+    background-color: #ffffff;
+  }
 
-    .formContainer {
-        box-shadow: none;
-        padding: 1rem;
-    }
-} 
+  .formContainer {
+    box-shadow: none;
+    padding: 1rem;
+  }
+}

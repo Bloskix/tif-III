@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import styles from './AlertsTab.module.css';
-import { alertService } from '../../services/alertService';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
-import AlertsFilters from '../AlertsFilters/AlertsFilters';
-import AlertDetailModal from '../AlertDetailModal/AlertDetailModal';
-import Button from '../Button/Button';
+import React, { useState, useEffect } from "react";
+import styles from "./AlertsTab.module.css";
+import { alertService } from "../../services/alertService";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+import AlertsFilters from "../AlertsFilters/AlertsFilters";
+import AlertDetailModal from "../AlertDetailModal/AlertDetailModal";
+import Button from "../Button/Button";
 
 const AlertsTab = () => {
   const [alerts, setAlerts] = useState([]);
@@ -29,15 +29,15 @@ const AlertsTab = () => {
       const response = await alertService.getAlerts({
         page: currentPage,
         size: PAGE_SIZE,
-        ...activeFilters
+        ...activeFilters,
       });
 
       setAlerts(response.alerts);
       setTotalAlerts(response.total);
       setError(null);
     } catch (err) {
-      console.error('Error en loadAlerts:', err);
-      setError('Error al cargar las alertas: ' + err.message);
+      console.error("Error en loadAlerts:", err);
+      setError("Error al cargar las alertas: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -46,10 +46,10 @@ const AlertsTab = () => {
   const formatDate = (dateString) => {
     try {
       const date = parseISO(dateString);
-      const formatted = format(date, 'dd/MM/yyyy HH:mm:ss', { locale: es });
+      const formatted = format(date, "dd/MM/yyyy HH:mm:ss", { locale: es });
       return formatted;
     } catch (error) {
-      return 'Fecha inválida';
+      return "Fecha inválida";
     }
   };
 
@@ -62,13 +62,13 @@ const AlertsTab = () => {
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev) => prev - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -78,8 +78,8 @@ const AlertsTab = () => {
       const alertDetails = await alertService.getAlertDetails(alertId);
       setSelectedAlert(alertDetails);
     } catch (err) {
-      console.error('Error al cargar los detalles de la alerta:', err);
-      setError('Error al cargar los detalles de la alerta: ' + err.message);
+      console.error("Error al cargar los detalles de la alerta:", err);
+      setError("Error al cargar los detalles de la alerta: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -91,11 +91,9 @@ const AlertsTab = () => {
 
   const handleAlertStatusChange = async (alertId, newStatus) => {
     // Actualizar el estado local de la alerta
-    setAlerts(prevAlerts => 
-      prevAlerts.map(alert => 
-        alert.id === alertId 
-          ? { ...alert, status: newStatus }
-          : alert
+    setAlerts((prevAlerts) =>
+      prevAlerts.map((alert) =>
+        alert.id === alertId ? { ...alert, status: newStatus } : alert
       )
     );
   };
@@ -111,18 +109,16 @@ const AlertsTab = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Button 
+        <Button
           onClick={() => setShowFilters(!showFilters)}
           variant="secondary"
         >
-          {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
+          {showFilters ? "Ocultar filtros" : "Mostrar filtros"}
         </Button>
       </div>
 
-      {showFilters && (
-        <AlertsFilters onApplyFilters={handleApplyFilters} />
-      )}
-      
+      {showFilters && <AlertsFilters onApplyFilters={handleApplyFilters} />}
+
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
@@ -136,7 +132,7 @@ const AlertsTab = () => {
             </tr>
           </thead>
           <tbody>
-            {alerts.map(alert => (
+            {alerts.map((alert) => (
               <tr key={alert.id}>
                 <td>{formatDate(alert.timestamp)}</td>
                 <td>{alert.agent.name}</td>
@@ -144,7 +140,7 @@ const AlertsTab = () => {
                 <td>{alert.rule.description}</td>
                 <td>{alert.rule.level}</td>
                 <td>
-                  <button 
+                  <button
                     className={styles.viewButton}
                     onClick={() => handleViewAlert(alert.id)}
                     title="Ver detalles"
@@ -159,8 +155,8 @@ const AlertsTab = () => {
       </div>
 
       <div className={styles.pagination}>
-        <button 
-          onClick={handlePreviousPage} 
+        <button
+          onClick={handlePreviousPage}
           disabled={currentPage === 1}
           className={styles.paginationButton}
         >
@@ -169,8 +165,8 @@ const AlertsTab = () => {
         <span className={styles.pageInfo}>
           Página {currentPage} de {totalPages}
         </span>
-        <button 
-          onClick={handleNextPage} 
+        <button
+          onClick={handleNextPage}
           disabled={currentPage === totalPages}
           className={styles.paginationButton}
         >
@@ -190,4 +186,4 @@ const AlertsTab = () => {
   );
 };
 
-export default AlertsTab; 
+export default AlertsTab;

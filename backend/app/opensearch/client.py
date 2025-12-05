@@ -33,21 +33,32 @@ class OpenSearchClient:
                 print("WARNING:  Verificación de certificados SSL desactivada")
                 ssl_context.verify_mode = ssl.CERT_NONE
 
-            self._client = OpenSearch(
-                hosts=[{
+            # Preparar argumentos base
+            client_args = {
+                'hosts': [{
                     'host': settings.OPENSEARCH_HOST,
                     'port': settings.OPENSEARCH_PORT
                 }],
-                http_auth=(settings.OPENSEARCH_USER, settings.OPENSEARCH_PASSWORD),
-                use_ssl=settings.OPENSEARCH_USE_SSL,
-                verify_certs=settings.OPENSEARCH_VERIFY_CERTS,
-                ssl_assert_hostname=False,
-                ssl_show_warn=False,
-                ca_certs=settings.OPENSEARCH_CA_CERTS,
-                connection_class=RequestsHttpConnection,
-                timeout=30,
-                ssl_context=ssl_context
-            )
+                'http_auth': (settings.OPENSEARCH_USER, settings.OPENSEARCH_PASSWORD),
+                'use_ssl': settings.OPENSEARCH_USE_SSL,
+                'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
+                'ssl_assert_hostname': False,
+                'ssl_show_warn': False,
+                'connection_class': RequestsHttpConnection,
+                'timeout': 30
+            }
+
+            # Solo agregar certificados CA si la verificación está activada
+            if settings.OPENSEARCH_VERIFY_CERTS:
+                client_args['ca_certs'] = settings.OPENSEARCH_CA_CERTS
+                client_args['ssl_context'] = ssl_context
+            else:
+                # Si no verificamos certificados, usamos un contexto SSL sin verificación
+                client_args['ssl_context'] = ssl.create_default_context()
+                client_args['ssl_context'].check_hostname = False
+                client_args['ssl_context'].verify_mode = ssl.CERT_NONE
+
+            self._client = OpenSearch(**client_args)
             self._initialized = True
             print("INFO:     Cliente OpenSearch inicializado exitosamente en", settings.OPENSEARCH_HOST, ":", settings.OPENSEARCH_PORT)
         except Exception as e:
